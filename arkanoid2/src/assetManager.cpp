@@ -49,7 +49,10 @@ void AssetManager::LoadTexture(const std::string& textureID, const std::string& 
 	}
 }
 
-void AssetManager::DrawTexture(const std::string& textureID)
+void AssetManager::DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_Rect& dest)
 {
-
+	if (SDL_RenderCopyEx(App::renderer, textures[textureID], &src, &dest, NULL, NULL, SDL_FLIP_NONE) != 0)
+	{
+		App::logger->LogSDL("DrawTexture: ");
+	}
 }

@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <list>
 #include <typeinfo>
 
 class Entity
@@ -15,7 +14,7 @@ public:
 
 	inline bool IsActive() const { return m_IsActive; }
 
-	void Deactivate() { m_IsActive = false; }
+	void Destroy() { m_IsActive = false; }
 private:
 	bool m_IsActive = true;
 };

@@ -16,6 +16,11 @@ SDL_Renderer* App::renderer = nullptr;
 Logger* App::logger = nullptr;
 AssetManager* App::assets = nullptr;
 
+uint32_t App::WINDOW_WIDTH = 800;
+uint32_t App::WINDOW_HEIGHT = 600;
+
+uint16_t App::ballsCount = 1;
+
 App::App()
 {
 	logger = new Logger();
@@ -40,12 +45,14 @@ App::App()
 
 	SDL_SetRenderDrawColor(renderer, 100, 50, 200, 255);
 
-	assets->LoadTexture("ball", "assets/ball256x256.png");
+	assets->LoadTexture("defaultBall", "assets/ball256x256.png");
 	assets->LoadTexture("greenTile", "assets/green_tile.png");
 	assets->LoadTexture("player", "assets/player64x32.png");
 
-	AddBall();
-	AddPlayer();
+	AddBall(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, "defaultBall");
+
+	player = new Player();
+	manager.AddEntity(player);
 
 	m_IsRunning = initialized;
 
@@ -54,7 +61,7 @@ App::App()
 
 App::~App()
 {
-	logger->LogDeconstructor(typeid(this).name());
+	player->Destroy();
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -62,6 +69,8 @@ App::~App()
 
 	delete App::assets;
 	delete App::logger;
+
+	logger->LogDeconstructor(typeid(this).name());
 }
 
 bool App::GetAppState() const
@@ -98,21 +107,32 @@ void App::Render()
 	SDL_RenderPresent(renderer);
 }
 
-void App::AddPlayer()
+void App::AddBall(uint32_t startX, uint32_t startY, const std::string& textureID)
 {
-	Player* player = new Player();
+	if (ballsCount >= 10000) // limit for active balls
+	{
+		logger->Print(typeid(this).name(), "Balls reached the limit.");
+		return;
+	}
 
-	manager.AddEntity(player);
-}
-
-void App::AddBall()
-{
-	Ball* ball = new Ball();
+	ballsCount++;
+	Ball* ball = new Ball(startX, startY, textureID, ballsCount);
 
 	manager.AddEntity(ball);
 }
 
-void App::RemoveBall()
+void App::RemoveBall(uint16_t ballID)
 {
+	for (auto it = balls.begin(); it != balls.end(); it++)
+	{
+		if ((*it)->GetBallID() != ballID)
+		{
+			continue;
+		}
 
+		(*it)->Destroy();
+		balls.erase(it);
+		ballsCount--;
+		break;
+	}
 }

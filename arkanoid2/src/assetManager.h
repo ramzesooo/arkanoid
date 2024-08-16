@@ -9,7 +9,7 @@ public:
 	~AssetManager();
 
 	void LoadTexture(const std::string& textureID, const std::string& path);
-	void DrawTexture(const std::string& textureID);
+	void DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_Rect& dest);
 private:
 	std::unordered_map<std::string, SDL_Texture*> textures;
 };
