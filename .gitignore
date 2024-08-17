@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/arkanoid2/SDL2.dll
+/arkanoid2/SDL2_image.dll
+/arkanoid2/SDL2_ttf.dll
+/arkanoid2/dep

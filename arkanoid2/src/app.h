@@ -20,9 +20,10 @@ public:
 	void Update();
 	void Render();
 
-	void AddBall(uint32_t startX, uint32_t startY, const std::string& textureID);
+	void AddBall(float startX, float startY, const std::string& textureID);
 	void RemoveBall(uint16_t ballID);
 
+	static float Speed;
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
 	static Logger* logger;
@@ -30,9 +31,10 @@ public:
 	static uint32_t WINDOW_WIDTH;
 	static uint32_t WINDOW_HEIGHT;
 	static uint16_t ballsCount;
+	static App* app;
+	static SDL_Event event;
 private:
 	Player* player = nullptr;
-	SDL_Event m_Event;
 	bool m_IsRunning = false;
 	std::vector<Ball*> balls;
 };

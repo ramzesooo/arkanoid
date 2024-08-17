@@ -12,10 +12,10 @@ public:
 	virtual void Update() {}
 	virtual void Draw() {}
 
-	inline bool IsActive() const { return m_IsActive; }
+	inline void Destroy() { m_IsActive = false; }
 
-	void Destroy() { m_IsActive = false; }
-private:
+	inline bool IsActive() const { return m_IsActive; }
+protected:
 	bool m_IsActive = true;
 };
 

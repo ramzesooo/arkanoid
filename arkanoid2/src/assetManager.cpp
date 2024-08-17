@@ -7,7 +7,7 @@
 
 AssetManager::AssetManager()
 {
-	App::logger->LogConstructor(typeid(this).name());
+	App::logger->LogConstructor(typeid(*this).name());
 }
 
 AssetManager::~AssetManager()
@@ -17,10 +17,10 @@ AssetManager::~AssetManager()
 		SDL_DestroyTexture(texture.second);
 		std::string output = "Destroyed texture ";
 		output += texture.first;
-		App::logger->Print(typeid(this).name(), output);
+		App::logger->Print(typeid(*this).name(), output);
 	}
 
-	App::logger->LogDeconstructor(typeid(this).name());
+	App::logger->LogDeconstructor(typeid(*this).name());
 }
 
 void AssetManager::LoadTexture(const std::string& textureID, const std::string& path)
@@ -45,13 +45,21 @@ void AssetManager::LoadTexture(const std::string& textureID, const std::string& 
 	{
 		std::string output = "LoadTexture: Loaded ";
 		output += textureID + " (" + path + ")";
-		App::logger->Debug(typeid(this).name(), output);
+		App::logger->Debug(typeid(*this).name(), output);
 	}
 }
 
 void AssetManager::DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_Rect& dest)
 {
 	if (SDL_RenderCopyEx(App::renderer, textures[textureID], &src, &dest, NULL, NULL, SDL_FLIP_NONE) != 0)
+	{
+		App::logger->LogSDL("DrawTexture: ");
+	}
+}
+
+void AssetManager::DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_FRect& dest)
+{
+	if (SDL_RenderCopyExF(App::renderer, textures[textureID], &src, &dest, NULL, NULL, SDL_FLIP_NONE) != 0)
 	{
 		App::logger->LogSDL("DrawTexture: ");
 	}
