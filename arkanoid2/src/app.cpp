@@ -11,8 +11,8 @@
 
 Manager manager;
 
-
-float App::Speed = 0.5f;
+float App::MaxSpeedX = 2.0f;
+float App::MinSpeedY = 0.5f;
 SDL_Window* App::window = nullptr;
 SDL_Renderer* App::renderer = nullptr;
 Logger* App::logger = nullptr;
@@ -54,7 +54,7 @@ App::App()
 	assets->LoadTexture("greenTile", "assets/green_tile.png");
 	assets->LoadTexture("player", "assets/player64x32.png");
 
-	AddBall(static_cast<float>(WINDOW_WIDTH / 2), static_cast<float>(WINDOW_HEIGHT / 2), "defaultBall");
+	AddBall(static_cast<float>(WINDOW_WIDTH / 2), static_cast<float>(WINDOW_HEIGHT / 2), "defaultBall", { 0.0f, 1.0f });
 
 	player = new Player();
 	manager.AddEntity(player);
@@ -67,12 +67,11 @@ App::App()
 App::~App()
 {
 	player->Destroy();
+	delete App::assets;
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
-
-	delete App::assets;
 
 	logger->LogDeconstructor(typeid(*this).name());
 	delete App::logger;
@@ -92,6 +91,12 @@ void App::EventHandler()
 	case SDL_QUIT:
 		m_IsRunning = false;
 		break;
+	case SDL_KEYDOWN:
+		if (event.key.keysym.sym == SDLK_F10)
+		{
+			AddBall(static_cast<float>(WINDOW_WIDTH / 2), static_cast<float>(WINDOW_HEIGHT / 2), "defaultBall", { 0.0f, 1.0f } );
+		}
+		break;
 	default:
 		break;
 	}
@@ -99,6 +104,11 @@ void App::EventHandler()
 
 void App::Update()
 {
+	for (const auto& ball : balls)
+	{
+		ball->AABB(player->GetPos());
+	}
+
 	manager.Refresh();
 	manager.Update();
 }
@@ -112,18 +122,18 @@ void App::Render()
 	SDL_RenderPresent(renderer);
 }
 
-void App::AddBall(float startX, float startY, const std::string& textureID)
+void App::AddBall(float startX, float startY, const std::string& textureID, Velocity velocity)
 {
-	if (ballsCount >= 10000) // limit for active balls
+	if (ballsCount >= 16500) // limit for active balls
 	{
-		logger->Print(typeid(*this).name(), "Balls reached the limit.");
+		logger->Print(typeid(*this).name(), "Balls reached the limit (" + std::to_string(ballsCount) + ")");
 		return;
 	}
 
-	ballsCount++;
-	Ball* ball = new Ball(startX, startY, textureID, ballsCount);
+	Ball* ball = new Ball(startX, startY, textureID, ballsCount, velocity);
 
 	manager.AddEntity(ball);
+	balls.push_back(ball);
 }
 
 void App::RemoveBall(uint16_t ballID)
@@ -137,7 +147,6 @@ void App::RemoveBall(uint16_t ballID)
 
 		(*it)->Destroy();
 		balls.erase(it);
-		ballsCount--;
 		break;
 	}
 }

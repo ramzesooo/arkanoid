@@ -7,6 +7,7 @@ class Logger;
 class Entity;
 class Ball;
 class Player;
+struct Velocity;
 
 class App
 {
@@ -20,10 +21,11 @@ public:
 	void Update();
 	void Render();
 
-	void AddBall(float startX, float startY, const std::string& textureID);
+	void AddBall(float startX, float startY, const std::string& textureID, Velocity velocity);
 	void RemoveBall(uint16_t ballID);
 
-	static float Speed;
+	static float MaxSpeedX;
+	static float MinSpeedY;
 	static SDL_Window* window;
 	static SDL_Renderer* renderer;
 	static Logger* logger;

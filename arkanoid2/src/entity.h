@@ -16,6 +16,8 @@ public:
 
 	inline bool IsActive() const { return m_IsActive; }
 protected:
+	std::string m_Tag = "";
+private:
 	bool m_IsActive = true;
 };
 

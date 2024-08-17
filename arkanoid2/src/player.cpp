@@ -6,6 +6,8 @@
 
 Player::Player()
 {
+	m_Tag = "player";
+
 	dest.x = App::WINDOW_WIDTH / 2 - dest.w / 2;
 	dest.y = App::WINDOW_HEIGHT / 2 + App::WINDOW_HEIGHT / 4;
 
@@ -21,22 +23,7 @@ void Player::Update()
 {
 	if (App::event.type == SDL_MOUSEMOTION)
 	{
-		int32_t mouseX = App::event.motion.x;
-
-		/*if (mouseX >= App::WINDOW_WIDTH + dest.w / 2)
-		{
-			mouseX = App::WINDOW_WIDTH - dest.w / 2;
-		}
-		else if (mouseX <= 0)
-		{
-			mouseX = -(dest.w / 2);
-		}
-		else
-		{
-			mouseX -= dest.w / 2;
-		}*/
-
-		dest.x = mouseX - dest.w / 2;
+		dest.x = App::event.motion.x - dest.w / 2;
 	}
 }
 

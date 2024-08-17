@@ -8,11 +8,14 @@ struct Velocity
 class Ball : public Entity
 {
 public:
-	Ball(float startX, float startY, const std::string& textureID, uint16_t ballID);
+	Ball(float startX, float startY, const std::string& textureID, uint16_t ballID, Velocity startVelocity);
 	~Ball();
 
 	void Update() override;
 	void Draw() override;
+
+	// Look for collisions AABB of the ball with another entity
+	void AABB(const SDL_Rect& entityPos);
 
 	inline uint16_t GetBallID() const { return m_ballID; }
 private:
