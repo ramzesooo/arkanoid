@@ -2,22 +2,28 @@
 #include <vector>
 #include <typeinfo>
 #include <string>
+#include <memory>
+
+enum class entity_type
+{
+	player = 0,
+	ball,
+	tile
+};
 
 class Entity
 {
 public:
-	Entity(){}
-
 	virtual ~Entity(){}
 
 	virtual void Update() {}
 	virtual void Draw() {}
 
-	inline void Destroy() { m_IsActive = false; }
+	void Destroy() { m_IsActive = false; }
 
-	inline bool IsActive() const { return m_IsActive; }
+	bool IsActive() const { return m_IsActive; }
 protected:
-	std::string m_Tag = "";
+	entity_type m_Tag;
 private:
 	bool m_IsActive = true;
 };
@@ -25,20 +31,22 @@ private:
 class Manager
 {
 public:
-	Manager(){}
-
-	~Manager()
+	void Refresh()
 	{
-		for (auto& e : entities)
+		for (auto it = entities.begin(); it != entities.end();)
 		{
-			delete e;
-			e = nullptr;
+			if ((*it)->IsActive())
+			{
+				it++;
+			}
+			else
+			{
+				it = entities.erase(it);
+			}
 		}
-
-		entities.clear();
 	}
 
-	void Refresh()
+	/*void Refresh()
 	{
 		std::vector<std::vector<Entity*>::iterator> garbage; // vector of entities iterators to erase from the vector
 
@@ -56,7 +64,7 @@ public:
 		{
 			entities.erase(*it);
 		}
-	}
+	}*/
 
 	void Update()
 	{
@@ -74,12 +82,20 @@ public:
 		}
 	}
 
-	template<typename T>
+	/*template<typename T>
 	void AddEntity(T& entity)
 	{
 		entities.push_back(entity);
+	}*/
+
+	template<class T, class... Args>
+	Entity* NewEntity(Args&&... args)
+	{
+		entities.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+		return entities.back().get();
 	}
 
 private:
-	std::vector<Entity*> entities;
+	//std::vector<Entity*> entities;
+	std::vector<std::unique_ptr<Entity>> entities;
 };

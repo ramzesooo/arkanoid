@@ -6,10 +6,10 @@
 
 Player::Player()
 {
-	m_Tag = "player";
+	m_Tag = entity_type::player;
 
-	dest.x = App::WINDOW_WIDTH / 2 - dest.w / 2;
-	dest.y = App::WINDOW_HEIGHT / 2 + App::WINDOW_HEIGHT / 4;
+	dest.x = static_cast<float>(App::WINDOW_WIDTH / 2 - dest.w / 2);
+	dest.y = static_cast<float>(App::WINDOW_HEIGHT / 2 + App::WINDOW_HEIGHT / 4);
 
 	App::logger->LogConstructor(typeid(*this).name());
 }

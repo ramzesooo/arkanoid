@@ -2,6 +2,7 @@
 #include "SDL.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 class Logger;
 class Entity;
@@ -16,17 +17,17 @@ public:
 	App();
 	~App();
 
-	bool GetAppState() const;
+	bool IsRunning() const;
 
 	void EventHandler();
 	void Update();
 	void Render();
 
-	void AddBall(float startX, float startY, const std::string& textureID, Velocity velocity);
-	void RemoveBall(uint16_t ballID);
+	void AddBall(float startX, float startY, Velocity velocity);
 
-	void AddTile(const std::string& textureID, uint32_t posX, uint32_t posY);
-	void RemoveTile(uint16_t tileID);
+	void AddTile(const std::string& textureID, float posX, float posY);
+
+	bool CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos);
 
 	static float MaxSpeedX;
 	static float MinSpeedY;
@@ -34,11 +35,8 @@ public:
 	static SDL_Renderer* renderer;
 	static Logger* logger;
 	static class AssetManager* assets;
-	static uint32_t WINDOW_WIDTH;
-	static uint32_t WINDOW_HEIGHT;
-	static uint16_t ballsCount;
-	static uint16_t tilesCount;
-	static App* app;
+	static const uint32_t WINDOW_WIDTH;
+	static const uint32_t WINDOW_HEIGHT;
 	static SDL_Event event;
 private:
 	Player* player = nullptr;

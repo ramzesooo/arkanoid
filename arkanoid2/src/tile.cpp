@@ -6,13 +6,9 @@
 #include "tile.h"
 #include <typeinfo>
 
-Tile::Tile(const std::string& textureID, uint32_t startX, uint32_t startY) : m_TextureID(textureID)
+Tile::Tile(const std::string& textureID, float startX, float startY) : m_TextureID(textureID)
 {
-	App::tilesCount++;
-
-	m_Tag = "tile";
-
-	m_TileID = App::tilesCount;
+	m_Tag = entity_type::tile;
 
 	dest.x = startX;
 	dest.y = startY;
@@ -22,8 +18,6 @@ Tile::Tile(const std::string& textureID, uint32_t startX, uint32_t startY) : m_T
 
 Tile::~Tile()
 {
-	App::tilesCount--;
-
 	App::logger->LogDeconstructor(typeid(*this).name());
 }
 

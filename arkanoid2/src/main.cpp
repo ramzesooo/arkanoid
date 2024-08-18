@@ -24,7 +24,7 @@ int main(int argc, char** arg)
 
 	App app;
 
-	while (app.GetAppState())
+	while (app.IsRunning())
 	{
 		app.EventHandler();
 		app.Update();
