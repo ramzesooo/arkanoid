@@ -25,6 +25,7 @@
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\ball.png" />
@@ -46,6 +47,7 @@
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\player.h" />
+    <ClInclude Include="src\tile.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -17,10 +17,10 @@ public:
 	// Look for collisions AABB of the ball with another entity
 	void AABB(const SDL_Rect& entityPos);
 
-	inline uint16_t GetBallID() const { return m_ballID; }
+	inline uint16_t GetBallID() const { return m_BallID; }
 private:
 	std::string m_TextureID = "";
-	uint16_t m_ballID = 0;
+	uint16_t m_BallID = 0;
 	SDL_Rect src{ 0, 0, 256, 256 };
 	SDL_FRect dest{ 0, 0, 12, 12 };
 	Velocity velocity{ 0.0f, 0.0f };

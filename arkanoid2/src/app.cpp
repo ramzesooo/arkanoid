@@ -6,6 +6,7 @@
 #include "entity.h"
 #include "player.h"
 #include "ball.h"
+#include "tile.h"
 #include "assetManager.h"
 #include "app.h"
 
@@ -24,6 +25,7 @@ uint32_t App::WINDOW_WIDTH = 800;
 uint32_t App::WINDOW_HEIGHT = 600;
 
 uint16_t App::ballsCount = 1;
+uint16_t App::tilesCount = 0;
 
 App::App()
 {
@@ -48,6 +50,10 @@ App::App()
 		initialized = false;
 	}
 	
+	SDL_Surface* iconSurface = IMG_Load("assets/gugu.png");
+	SDL_SetWindowIcon(window, iconSurface);
+	SDL_FreeSurface(iconSurface);
+
 	SDL_SetRenderDrawColor(renderer, 100, 50, 200, 255);
 
 	assets->LoadTexture("defaultBall", "assets/ball256x256.png");
@@ -58,6 +64,14 @@ App::App()
 
 	player = new Player();
 	manager.AddEntity(player);
+
+	for (int y = 0; y < 10; y++)
+	{
+		for (int x = 0; x < 10; x++)
+		{
+			AddTile("greenTile", (x * 64), (y * 16));
+		}
+	}
 
 	m_IsRunning = initialized;
 
@@ -104,13 +118,13 @@ void App::EventHandler()
 
 void App::Update()
 {
+	manager.Refresh();
+	manager.Update();
+
 	for (const auto& ball : balls)
 	{
 		ball->AABB(player->GetPos());
 	}
-
-	manager.Refresh();
-	manager.Update();
 }
 
 void App::Render()
@@ -147,6 +161,29 @@ void App::RemoveBall(uint16_t ballID)
 
 		(*it)->Destroy();
 		balls.erase(it);
+		break;
+	}
+}
+
+void App::AddTile(const std::string& textureID, uint32_t posX, uint32_t posY)
+{
+	Tile* tile = new Tile(textureID, posX, posY);
+
+	manager.AddEntity(tile);
+	tiles.push_back(tile);
+}
+
+void App::RemoveTile(uint16_t tileID)
+{
+	for (auto it = tiles.begin(); it != tiles.end(); it++)
+	{
+		if ((*it)->GetTileID() != tileID)
+		{
+			continue;
+		}
+
+		(*it)->Destroy();
+		tiles.erase(it);
 		break;
 	}
 }

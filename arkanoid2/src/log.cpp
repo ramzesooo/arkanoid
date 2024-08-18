@@ -4,7 +4,7 @@
 #include "SDL_ttf.h"
 #include "log.h"
 
-void Logger::LogSDL(const std::string& additionalText = "")
+void Logger::LogSDL(const std::string& additionalText = "") const
 {
 	std::cout << "\n" << additionalText;
 
@@ -21,7 +21,7 @@ void Logger::LogSDL(const std::string& additionalText = "")
 	}
 }
 
-void Logger::LogTTF(const std::string& additionalText = "")
+void Logger::LogTTF(const std::string& additionalText = "") const
 {
 	std::cout << "\n" << additionalText;
 
@@ -38,22 +38,22 @@ void Logger::LogTTF(const std::string& additionalText = "")
 	}
 }
 
-void Logger::LogConstructor(const std::string& tag)
+void Logger::LogConstructor(const std::string& tag) const
 {
 	std::cout << tag << " has been created" << std::endl;
 }
 
-void Logger::LogDeconstructor(const std::string& tag)
+void Logger::LogDeconstructor(const std::string& tag) const
 {
 	std::cout << tag << " has been destroyed" << std::endl;
 }
 
-void Logger::Debug(const std::string& tag, const std::string& text)
+void Logger::Debug(const std::string& tag, const std::string& text) const
 {
 	std::cout << tag << "::" << text << "\n";
 }
 
-void Logger::Print(const std::string& tag, const std::string& text)
+void Logger::Print(const std::string& tag, const std::string& text) const
 {
 	std::cout << tag << ": " << text << "\n";
 }

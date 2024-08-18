@@ -1,12 +1,11 @@
 #include "SDL.h"
-#include "SDL_image.h"
 #include "assetManager.h"
 #include "app.h"
 #include "log.h"
 #include "entity.h"
 #include "ball.h"
 
-Ball::Ball(float startX, float startY, const std::string& textureID, uint16_t ballID, Velocity startVelocity) : m_TextureID(textureID), m_ballID(ballID), velocity(startVelocity)
+Ball::Ball(float startX, float startY, const std::string& textureID, uint16_t ballID, Velocity startVelocity) : m_TextureID(textureID), m_BallID(ballID), velocity(startVelocity)
 {
 	m_Tag = "ball";
 
