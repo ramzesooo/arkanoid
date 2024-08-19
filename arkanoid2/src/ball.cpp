@@ -5,24 +5,17 @@
 #include "entity.h"
 #include "ball.h"
 
-Ball::Ball(float startX, float startY, Velocity startVelocity) : velocity(startVelocity)
+Ball::Ball(float startX, float startY, Velocity startVelocity) : Entity(entity_type::ball), velocity(startVelocity)
 {
-	m_Tag = entity_type::ball;
-
 	dest.x = startX;
 	dest.y = startY;
 
-	App::logger->LogConstructor(typeid(*this).name());
-}
-
-Ball::~Ball()
-{
-	App::logger->LogDeconstructor(typeid(*this).name());
+	App::s_Logger->LogConstructor(typeid(*this).name());
 }
 
 void Ball::Draw()
 {
-	App::assets->DrawTexture("defaultBall", src, dest);
+	App::s_Assets->DrawTexture("defaultBall", Ball::ball_source, dest);
 }
 
 void Ball::Update()

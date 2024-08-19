@@ -43,7 +43,7 @@ void Logger::LogConstructor(const std::string& tag) const
 	std::cout << tag << " has been created" << std::endl;
 }
 
-void Logger::LogDeconstructor(const std::string& tag) const
+void Logger::LogDestructor(const std::string& tag) const
 {
 	std::cout << tag << " has been destroyed" << std::endl;
 }

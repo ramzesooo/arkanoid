@@ -4,30 +4,23 @@
 #include "entity.h"
 #include "player.h"
 
-Player::Player()
+Player::Player() : Entity(entity_type::player)
 {
-	m_Tag = entity_type::player;
-
 	dest.x = static_cast<float>(App::WINDOW_WIDTH / 2 - dest.w / 2);
 	dest.y = static_cast<float>(App::WINDOW_HEIGHT / 2 + App::WINDOW_HEIGHT / 4);
 
-	App::logger->LogConstructor(typeid(*this).name());
-}
-
-Player::~Player()
-{
-	App::logger->LogDeconstructor(typeid(*this).name());
+	App::s_Logger->LogConstructor(typeid(*this).name());
 }
 
 void Player::Update()
 {
-	if (App::event.type == SDL_MOUSEMOTION)
+	if (App::s_Event.type == SDL_MOUSEMOTION)
 	{
-		dest.x = App::event.motion.x - dest.w / 2;
+		dest.x = App::s_Event.motion.x - dest.w / 2;
 	}
 }
 
 void Player::Draw()
 {
-	App::assets->DrawTexture("player", src, dest);
+	App::s_Assets->DrawTexture("player", Player::player_source, dest);
 }

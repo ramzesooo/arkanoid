@@ -6,14 +6,15 @@
 
 enum class entity_type
 {
-	player = 0,
-	ball,
+	ball = 0,
+	player,
 	tile
 };
 
 class Entity
 {
 public:
+	Entity(entity_type tag) : m_Tag(tag){}
 	virtual ~Entity(){}
 
 	virtual void Update() {}
@@ -31,6 +32,7 @@ private:
 class Manager
 {
 public:
+	// Refreshes vector of unique pointers to all existing Entities
 	void Refresh()
 	{
 		for (auto it = entities.begin(); it != entities.end();)
@@ -45,26 +47,6 @@ public:
 			}
 		}
 	}
-
-	/*void Refresh()
-	{
-		std::vector<std::vector<Entity*>::iterator> garbage; // vector of entities iterators to erase from the vector
-
-		for (auto it = entities.begin(); it != entities.end(); it++)
-		{
-			if (!(*it)->IsActive())
-			{
-				delete* it;
-				*it = nullptr;
-				garbage.push_back(it);
-			}
-		}
-
-		for (auto it = garbage.rbegin(); it != garbage.rend(); it++)
-		{
-			entities.erase(*it);
-		}
-	}*/
 
 	void Update()
 	{
@@ -82,12 +64,6 @@ public:
 		}
 	}
 
-	/*template<typename T>
-	void AddEntity(T& entity)
-	{
-		entities.push_back(entity);
-	}*/
-
 	template<class T, class... Args>
 	Entity* NewEntity(Args&&... args)
 	{
@@ -96,6 +72,5 @@ public:
 	}
 
 private:
-	//std::vector<Entity*> entities;
 	std::vector<std::unique_ptr<Entity>> entities;
 };

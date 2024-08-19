@@ -7,6 +7,8 @@
 int main(int argc, char** arg)
 {
 	{
+		// NOTE: Logger is defined in the scope just to output a log if something's wrong while initializing all the stuff from SDL
+		// Relevant logger is defined as static in App class
 		Logger logger;
 
 		if (SDL_Init(SDL_INIT_EVERYTHING) != 0)

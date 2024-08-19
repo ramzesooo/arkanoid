@@ -6,19 +6,13 @@
 #include "tile.h"
 #include <typeinfo>
 
-Tile::Tile(const std::string& textureID, float startX, float startY) : m_TextureID(textureID)
+Tile::Tile(const std::string& textureID, float startX, float startY) : Entity(entity_type::tile), m_TextureID(textureID)
 {
-	m_Tag = entity_type::tile;
-
 	dest.x = startX;
 	dest.y = startY;
+	dest.w = App::s_TilesWidth;
 
-	App::logger->LogConstructor(typeid(*this).name());
-}
-
-Tile::~Tile()
-{
-	App::logger->LogDeconstructor(typeid(*this).name());
+	App::s_Logger->LogConstructor(typeid(*this).name());
 }
 
 void Tile::Update()
@@ -28,5 +22,5 @@ void Tile::Update()
 
 void Tile::Draw()
 {
-	App::assets->DrawTexture(m_TextureID, src, dest);
+	App::s_Assets->DrawTexture(m_TextureID, Tile::tile_source, dest);
 }

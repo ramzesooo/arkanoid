@@ -7,7 +7,7 @@
 
 AssetManager::AssetManager()
 {
-	App::logger->LogConstructor(typeid(*this).name());
+	App::s_Logger->LogConstructor(typeid(*this).name());
 }
 
 AssetManager::~AssetManager()
@@ -17,10 +17,10 @@ AssetManager::~AssetManager()
 		SDL_DestroyTexture(texture.second);
 		std::string output = "Destroyed texture ";
 		output += texture.first;
-		App::logger->Print(typeid(*this).name(), output);
+		App::s_Logger->Print(typeid(*this).name(), output);
 	}
 
-	App::logger->LogDeconstructor(typeid(*this).name());
+	App::s_Logger->LogDestructor(typeid(*this).name());
 }
 
 void AssetManager::LoadTexture(const std::string& textureID, const std::string& path)
@@ -28,14 +28,14 @@ void AssetManager::LoadTexture(const std::string& textureID, const std::string& 
 	SDL_Surface* tempSurface = IMG_Load(path.c_str());
 	if (!tempSurface)
 	{
-		App::logger->LogSDL("LoadTexture (missing tempSurface): ");
+		App::s_Logger->LogSDL("LoadTexture (missing tempSurface): ");
 		return;
 	}
 
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(App::renderer, tempSurface);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(App::s_Renderer, tempSurface);
 	if (!texture)
 	{
-		App::logger->LogSDL("LoadTexture (missing texture from surface): ");
+		App::s_Logger->LogSDL("LoadTexture (missing texture from surface): ");
 		return;
 	}
 
@@ -45,14 +45,14 @@ void AssetManager::LoadTexture(const std::string& textureID, const std::string& 
 	{
 		std::string output = "LoadTexture: Loaded ";
 		output += textureID + " (" + path + ")";
-		App::logger->Debug(typeid(*this).name(), output);
+		App::s_Logger->Debug(typeid(*this).name(), output);
 	}
 }
 
 void AssetManager::DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_FRect& dest)
 {
-	if (SDL_RenderCopyExF(App::renderer, textures[textureID], &src, &dest, NULL, NULL, SDL_FLIP_NONE) != 0)
+	if (SDL_RenderCopyExF(App::s_Renderer, textures[textureID], &src, &dest, NULL, NULL, SDL_FLIP_NONE) != 0)
 	{
-		App::logger->LogSDL("DrawTexture: ");
+		App::s_Logger->LogSDL("DrawTexture: ");
 	}
 }

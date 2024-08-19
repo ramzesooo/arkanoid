@@ -17,11 +17,13 @@ public:
 	App();
 	~App();
 
-	bool IsRunning() const;
+	bool IsRunning() const { return m_IsRunning; }
 
+	// Functions called in main loop
 	void EventHandler();
 	void Update();
 	void Render();
+	// End
 
 	void AddBall(float startX, float startY, Velocity velocity);
 
@@ -29,15 +31,17 @@ public:
 
 	bool CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos);
 
-	static float MaxSpeedX;
-	static float MinSpeedY;
-	static SDL_Window* window;
-	static SDL_Renderer* renderer;
-	static Logger* logger;
-	static class AssetManager* assets;
 	static const uint32_t WINDOW_WIDTH;
 	static const uint32_t WINDOW_HEIGHT;
-	static SDL_Event event;
+
+	static float s_MaxSpeedX;
+	static float s_MinSpeedY;
+	static float s_TilesWidth;
+	static SDL_Window* s_Window;
+	static SDL_Renderer* s_Renderer;
+	static Logger* s_Logger;
+	static class AssetManager* s_Assets;
+	static SDL_Event s_Event;
 private:
 	Player* player = nullptr;
 	bool m_IsRunning = false;
