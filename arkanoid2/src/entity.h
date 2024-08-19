@@ -3,30 +3,37 @@
 #include <typeinfo>
 #include <string>
 #include <memory>
+#include <bitset>
+#include <array>
 
-enum class entity_type
-{
-	ball = 0,
-	player,
-	tile
-};
+constexpr std::size_t maxGroups = 8;
+
+class Manager;
 
 class Entity
 {
 public:
-	Entity(entity_type tag) : m_Tag(tag){}
+	Entity(Manager& manager, const SDL_FRect& destRect) : m_Manager(manager), dest(destRect) {}
 	virtual ~Entity(){}
 
 	virtual void Update() {}
 	virtual void Draw() {}
 
+	const SDL_FRect& GetPos() { return dest; }
+
 	void Destroy() { m_IsActive = false; }
 
 	bool IsActive() const { return m_IsActive; }
+
+	bool HasGroup(std::size_t group) const { return m_GroupBitSet[group]; }
+	void AddGroup(std::size_t group);
+	void DeleteGroup(std::size_t group) { m_GroupBitSet[group] = false; }
 protected:
-	entity_type m_Tag;
+	SDL_FRect dest{ .0f, .0f, .0f, .0f };
 private:
 	bool m_IsActive = true;
+	Manager& m_Manager;
+	std::bitset<maxGroups> m_GroupBitSet;
 };
 
 class Manager
@@ -35,6 +42,21 @@ public:
 	// Refreshes vector of unique pointers to all existing Entities
 	void Refresh()
 	{
+		for (auto i(0u); i < maxGroups; i++)
+		{
+			for (auto it = groupedEntities[i].begin(); it != groupedEntities[i].end();)
+			{
+				if ((*it)->IsActive())
+				{
+					it++;
+				}
+				else
+				{
+					it = groupedEntities[i].erase(it);
+				}
+			}
+		}
+
 		for (auto it = entities.begin(); it != entities.end();)
 		{
 			if ((*it)->IsActive())
@@ -64,13 +86,24 @@ public:
 		}
 	}
 
+	void AddToGroup(Entity* entity, std::size_t group)
+	{
+		groupedEntities[group].emplace_back(entity);
+	}
+
+	std::vector<Entity*>& GetGroup(std::size_t group)
+	{
+		return groupedEntities[group];
+	}
+
 	template<class T, class... Args>
-	Entity* NewEntity(Args&&... args)
+	T* NewEntity(Args&&... args)
 	{
 		entities.push_back(std::make_unique<T>(std::forward<Args>(args)...));
-		return entities.back().get();
+		return static_cast<T*>(entities.back().get());
 	}
 
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
+	std::array<std::vector<Entity*>, maxGroups> groupedEntities;
 };

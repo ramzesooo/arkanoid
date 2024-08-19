@@ -22,6 +22,7 @@
     <ClCompile Include="src\app.cpp" />
     <ClCompile Include="src\assetManager.cpp" />
     <ClCompile Include="src\ball.cpp" />
+    <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\player.cpp" />

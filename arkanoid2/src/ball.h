@@ -14,10 +14,11 @@ public:
 	void Draw() override;
 
 	Velocity& GetVelocity() { return velocity; }
-	const SDL_FRect& GetPos() { return dest; }
+
+	void HitPlayer(const SDL_FRect& playerPos);
 private:
 	static constexpr SDL_Rect ball_source{ 0, 0, 256, 256 };
 	//SDL_Rect src{ 0, 0, 256, 256 };
-	SDL_FRect dest{ 0.0f, 0.0f, 12.0f, 12.0f };
+	//SDL_FRect dest{ 0.0f, 0.0f, 12.0f, 12.0f };
 	Velocity velocity{ 0.0f, 0.0f };
 };

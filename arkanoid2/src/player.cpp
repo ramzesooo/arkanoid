@@ -4,10 +4,11 @@
 #include "entity.h"
 #include "player.h"
 
-Player::Player() : Entity(entity_type::player)
+Player::Player() 
+	: Entity(*App::s_Manager, { (float)App::WINDOW_WIDTH / 2 - dest.w / 2, (float)App::WINDOW_HEIGHT / 2 + (float)App::WINDOW_HEIGHT / 4, 64, 32 })
 {
-	dest.x = static_cast<float>(App::WINDOW_WIDTH / 2 - dest.w / 2);
-	dest.y = static_cast<float>(App::WINDOW_HEIGHT / 2 + App::WINDOW_HEIGHT / 4);
+	//dest.x = (float)App::WINDOW_WIDTH / 2 - dest.w / 2;
+	//dest.y = (float)App::WINDOW_HEIGHT / 2 + (float)App::WINDOW_HEIGHT / 4;
 
 	App::s_Logger->LogConstructor(typeid(*this).name());
 }

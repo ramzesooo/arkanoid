@@ -9,6 +9,8 @@ class Entity;
 class Ball;
 class Tile;
 class Player;
+class Manager;
+
 struct Velocity;
 
 class App
@@ -31,6 +33,13 @@ public:
 
 	bool CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos);
 
+	enum entityGroups : std::size_t
+	{
+		groupBalls = 0,
+		groupPlayers,
+		groupTiles
+	};
+
 	static const uint32_t WINDOW_WIDTH;
 	static const uint32_t WINDOW_HEIGHT;
 
@@ -42,9 +51,10 @@ public:
 	static Logger* s_Logger;
 	static class AssetManager* s_Assets;
 	static SDL_Event s_Event;
+	static std::unique_ptr<Manager> s_Manager;
 private:
 	Player* player = nullptr;
 	bool m_IsRunning = false;
-	std::vector<Ball*> balls;
-	std::vector<Tile*> tiles;
+	/*std::vector<Ball*> balls;
+	std::vector<Tile*> tiles;*/
 };

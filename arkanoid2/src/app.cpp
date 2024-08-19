@@ -20,8 +20,7 @@ SDL_Renderer* App::s_Renderer = nullptr;
 Logger* App::s_Logger = nullptr;
 AssetManager* App::s_Assets = nullptr;
 SDL_Event App::s_Event;
-
-Manager manager;
+std::unique_ptr<Manager> App::s_Manager = std::make_unique<Manager>();
 
 App::App()
 {
@@ -70,19 +69,20 @@ App::App()
 	for (int i = 0; i < 11; ++i)
 		AddBall(static_cast<float>(WINDOW_WIDTH / 2) + i, static_cast<float>(WINDOW_HEIGHT / 2) + i, { 0.0f, 1.0f });
 
-	// player is Player class, but manager.NewEntity returns a pointer to Entity class
-	player = static_cast<Player*>(manager.NewEntity<Player>());
+	player = s_Manager->NewEntity<Player>();
+	player->AddGroup(groupPlayers);
 
 	m_IsRunning = initialized;
 
 	s_Logger->LogConstructor(typeid(*this).name());
 }
 
+auto& balls = App::s_Manager->GetGroup(App::groupBalls);
+auto& players = App::s_Manager->GetGroup(App::groupPlayers);
+auto& tiles = App::s_Manager->GetGroup(App::groupTiles);
+
 App::~App()
 {
-	s_Logger->Print(typeid(*this).name(), std::to_string(balls.size()));
-	s_Logger->Print(typeid(*this).name(), std::to_string(tiles.size()));
-
 	delete App::s_Assets;
 
 	SDL_DestroyRenderer(s_Renderer);
@@ -115,49 +115,47 @@ void App::EventHandler()
 
 void App::Update()
 {
-	const SDL_FRect& playerPos = player->GetPos();
-
 	// Refresh balls vector and manage all existing balls
-	for (auto it = balls.begin(); it != balls.end();)
-	{
-		if (*it && (*it)->IsActive())
-		{
-			const SDL_FRect& ballPos = (*it)->GetPos();
+	//for (auto it = balls.begin(); it != balls.end();)
+	//{
+	//	if (*it && (*it)->IsActive())
+	//	{
+	//		const SDL_FRect& ballPos = (*it)->GetPos();
 
-			// Make the ball bounce after hitting a player
-			if (CheckCollisions(ballPos, playerPos))
-			{
-				Velocity& velocity = (*it)->GetVelocity();
+	//		// Make the ball bounce after hitting a player
+	//		if (CheckCollisions(ballPos, playerPos))
+	//		{
+	//			Velocity& velocity = (*it)->GetVelocity();
 
-				float centerX = playerPos.x + playerPos.w / 2;
-				float centerY = playerPos.y + playerPos.h / 2;
+	//			float centerX = playerPos.x + playerPos.w / 2;
+	//			float centerY = playerPos.y + playerPos.h / 2;
 
-				// distance from the center of player
-				float distanceX = ((ballPos.x + ballPos.w / 2) - centerX) / (playerPos.w / 2);
+	//			// distance from the center of player
+	//			float distanceX = ((ballPos.x + ballPos.w / 2) - centerX) / (playerPos.w / 2);
 
-				velocity.x = distanceX * App::s_MaxSpeedX;
+	//			velocity.x = distanceX * App::s_MaxSpeedX;
 
-				velocity.y = -std::abs(velocity.y);
+	//			velocity.y = -std::abs(velocity.y);
 
-				if (std::abs(velocity.y) < App::s_MinSpeedY)
-				{
-					velocity.y = -App::s_MinSpeedY;
-				}
+	//			if (std::abs(velocity.y) < App::s_MinSpeedY)
+	//			{
+	//				velocity.y = -App::s_MinSpeedY;
+	//			}
 
-				App::s_Logger->Print(typeid(*this).name(), std::to_string(velocity.x) + ", " + std::to_string(velocity.y));
-			}
+	//			App::s_Logger->Print(typeid(*this).name(), std::to_string(velocity.x) + ", " + std::to_string(velocity.y));
+	//		}
 
-			it++;
-		}
-		else
-		{
-			it = balls.erase(it);
-		}
-	}
+	//		it++;
+	//	}
+	//	else
+	//	{
+	//		it = balls.erase(it);
+	//	}
+	//}
 	// End of refreshing balls vector
 
 	// Refresh tiles vector and manage all existing tiles
-	for (auto it = tiles.begin(); it != tiles.end();)
+	/*for (auto it = tiles.begin(); it != tiles.end();)
 	{
 		if (*it && (*it)->IsActive())
 		{
@@ -167,18 +165,44 @@ void App::Update()
 		{
 			it = tiles.erase(it);
 		}
-	}
+	}*/
 	// End of refreshing tiles vector
 
-	manager.Refresh();
-	manager.Update();
+	s_Manager->Refresh();
+	s_Manager->Update();
+
+	const SDL_FRect& playerPos = player->GetPos();
+
+	for (const auto& b : balls)
+	{
+		const SDL_FRect& ballPos = b->GetPos();
+
+		if (CheckCollisions(ballPos, playerPos))
+		{
+			static_cast<Ball*>(b)->HitPlayer(playerPos);
+		}
+	}
 }
 
 void App::Render()
 {
 	SDL_RenderClear(s_Renderer);
 
-	manager.Draw();
+	//manager.Draw();
+	for (const auto& t : tiles)
+	{
+		t->Draw();
+	}
+
+	for (const auto& b : balls)
+	{
+		b->Draw();
+	}
+
+	for (const auto& p : players)
+	{
+		p->Draw();
+	}
 
 	SDL_RenderPresent(s_Renderer);
 }
@@ -191,14 +215,16 @@ void App::AddBall(float startX, float startY, Velocity velocity)
 		return;
 	}
 
-	auto* ball = static_cast<Ball*>(manager.NewEntity<Ball>(startX, startY, velocity));
-	balls.push_back(ball);
+	auto* ball = s_Manager->NewEntity<Ball>(startX, startY, velocity);
+	ball->AddGroup(groupBalls);
+	//balls.push_back(ball);
 }
 
 void App::AddTile(const std::string& textureID, float posX, float posY)
 {
-	auto* tile = static_cast<Tile*>(manager.NewEntity<Tile>(textureID, posX, posY));
-	tiles.push_back(tile);
+	auto* tile = s_Manager->NewEntity<Tile>(textureID, posX, posY);
+	tile->AddGroup(groupTiles);
+	//tiles.push_back(tile);
 }
 
 bool App::CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos)
