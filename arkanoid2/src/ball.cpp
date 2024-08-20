@@ -52,7 +52,6 @@ void Ball::Update()
 void Ball::HitPlayer(const SDL_FRect& playerPos)
 {
 	float centerX = playerPos.x + playerPos.w / 2;
-	float centerY = playerPos.y + playerPos.h / 2;
 
 	// distance from the center of player
 	float distanceX = ((dest.x + dest.w / 2) - centerX) / (playerPos.w / 2);
@@ -72,7 +71,6 @@ void Ball::HitPlayer(const SDL_FRect& playerPos)
 void Ball::HitTile(const SDL_FRect& tilePos)
 {
 	float centerX = tilePos.x + tilePos.w / 2;
-	float centerY = tilePos.y + tilePos.h / 2;
 
 	// distance from the center of player
 	float distanceX = ((dest.x + dest.w / 2) - centerX) / (tilePos.w / 2);
