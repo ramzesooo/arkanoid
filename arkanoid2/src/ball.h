@@ -16,6 +16,7 @@ public:
 	Velocity& GetVelocity() { return velocity; }
 
 	void HitPlayer(const SDL_FRect& playerPos);
+	void HitTile(const SDL_FRect& tilePos);
 private:
 	static constexpr SDL_Rect ball_source{ 0, 0, 256, 256 };
 	//SDL_Rect src{ 0, 0, 256, 256 };

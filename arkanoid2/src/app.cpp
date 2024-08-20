@@ -38,7 +38,7 @@ App::App()
 		initialized = false;
 	}
 
-	s_Renderer = SDL_CreateRenderer(s_Window, -1, SDL_RENDERER_PRESENTVSYNC);
+	s_Renderer = SDL_CreateRenderer(s_Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!s_Renderer)
 	{
 		s_Logger->LogSDL("Creating renderer: ");
@@ -66,8 +66,8 @@ App::App()
 		}
 	}
 
-	for (int i = 0; i < 11; ++i)
-		AddBall(static_cast<float>(WINDOW_WIDTH / 2) + i, static_cast<float>(WINDOW_HEIGHT / 2) + i, { 0.0f, 1.0f });
+	for (float i = 0.0f; i < 10.0f; ++i)
+		AddBall(static_cast<float>(WINDOW_WIDTH / 2), static_cast<float>(WINDOW_HEIGHT / 2) + (i / (i - 1)), { 0.0f, 1.0f });
 
 	player = s_Manager->NewEntity<Player>();
 	player->AddGroup(groupPlayers);
@@ -169,7 +169,6 @@ void App::Update()
 	// End of refreshing tiles vector
 
 	s_Manager->Refresh();
-	s_Manager->Update();
 
 	const SDL_FRect& playerPos = player->GetPos();
 
@@ -177,11 +176,36 @@ void App::Update()
 	{
 		const SDL_FRect& ballPos = b->GetPos();
 
-		if (CheckCollisions(ballPos, playerPos))
+		// TODO: Fix calculations for bouncing ball and adjust SDL_HasIntersectionF to project's needs
+
+		// Check for hitting a player at first place
+		if (SDL_HasIntersectionF(&ballPos, &playerPos))
 		{
+			// If the ball collides with a player, then trigger function HitPlayer() in Ball class and skip rest of the code
 			static_cast<Ball*>(b)->HitPlayer(playerPos);
+			continue;
+		}
+
+		// Check collisions with tiles
+		for (const auto& t : tiles)
+		{
+			const SDL_FRect& tilePos = t->GetPos();
+
+			if (SDL_HasIntersectionF(&ballPos, &tilePos))
+			{
+				// Make the ball bouncing
+				static_cast<Ball*>(b)->HitTile(tilePos);
+
+				// Logic for hitted tile
+				// NOTE: Temporarily it's just destroying the tile
+				// TODO: Let's make some perks dropping from tiles in future
+				t->Destroy();
+
+				//App::s_Logger->Print(typeid(*this).name(), "Tile has been hitted");
+			}
 		}
 	}
+	s_Manager->Update();
 }
 
 void App::Render()
@@ -209,7 +233,7 @@ void App::Render()
 
 void App::AddBall(float startX, float startY, Velocity velocity)
 {
-	if (balls.size() >= 1000) // limit for active balls
+	if (balls.size() >= 15000) // limit for active balls
 	{
 		s_Logger->Print(typeid(*this).name(), "Balls have reached their limit (" + std::to_string(balls.size()) + ")");
 		return;

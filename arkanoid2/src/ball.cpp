@@ -66,5 +66,25 @@ void Ball::HitPlayer(const SDL_FRect& playerPos)
 		velocity.y = -App::s_MinSpeedY;
 	}
 
-	App::s_Logger->Print(typeid(*this).name(), std::to_string(velocity.x) + ", " + std::to_string(velocity.y));
+	//App::s_Logger->Print(typeid(*this).name(), std::to_string(velocity.x) + ", " + std::to_string(velocity.y));
+}
+
+void Ball::HitTile(const SDL_FRect& tilePos)
+{
+	float centerX = tilePos.x + tilePos.w / 2;
+	float centerY = tilePos.y + tilePos.h / 2;
+
+	// distance from the center of player
+	float distanceX = ((dest.x + dest.w / 2) - centerX) / (tilePos.w / 2);
+
+	velocity.x = distanceX * App::s_MaxSpeedX;
+
+	velocity.y = -(-std::abs(velocity.y));
+
+	if (std::abs(velocity.y) < App::s_MinSpeedY)
+	{
+		velocity.y = -(-App::s_MinSpeedY);
+	}
+
+	//App::s_Logger->Print(typeid(*this).name(), std::to_string(velocity.x) + ", " + std::to_string(velocity.y));
 }

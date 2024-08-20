@@ -14,11 +14,11 @@ AssetManager::~AssetManager()
 {
 	for (auto& texture : textures)
 	{
+		App::s_Logger->Print(typeid(*this).name(), std::string("Destroying texture ") + texture.first);
 		SDL_DestroyTexture(texture.second);
-		std::string output = "Destroyed texture ";
-		output += texture.first;
-		App::s_Logger->Print(typeid(*this).name(), output);
 	}
+
+	textures.clear();
 
 	App::s_Logger->LogDestructor(typeid(*this).name());
 }
@@ -38,15 +38,11 @@ void AssetManager::LoadTexture(const std::string& textureID, const std::string& 
 		App::s_Logger->LogSDL("LoadTexture (missing texture from surface): ");
 		return;
 	}
-
 	textures.emplace(textureID, texture);
+
 	SDL_FreeSurface(tempSurface);
 
-	{
-		std::string output = "LoadTexture: Loaded ";
-		output += textureID + " (" + path + ")";
-		App::s_Logger->Debug(typeid(*this).name(), output);
-	}
+	App::s_Logger->Debug(typeid(*this).name(), std::string("LoadTexture: Loaded" + textureID + " (" + path + ")"));
 }
 
 void AssetManager::DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_FRect& dest)

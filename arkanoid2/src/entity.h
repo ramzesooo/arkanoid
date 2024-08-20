@@ -100,7 +100,7 @@ public:
 	T* NewEntity(Args&&... args)
 	{
 		entities.push_back(std::make_unique<T>(std::forward<Args>(args)...));
-		return static_cast<T*>(entities.back().get());
+		return (T*)entities.back().get();
 	}
 
 private:
