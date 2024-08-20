@@ -115,4 +115,11 @@ void App::AddBall()
 void App::RemoveBall()
 {
 
+// Don't need this anymore
+bool App::CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos)
+{
+	return (ballPos.y + ballPos.h / 2 >= entityPos.y
+		&& ballPos.y <= entityPos.y + entityPos.h
+		&& ballPos.x + ballPos.w / 2 >= entityPos.x
+		&& ballPos.x <= entityPos.x + entityPos.w);
 }
