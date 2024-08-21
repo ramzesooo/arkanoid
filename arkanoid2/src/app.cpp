@@ -65,6 +65,7 @@ App::App()
 	s_Assets->LoadTexture("perkShrink", "assets/perks/shrink_player.png");
 	s_Assets->LoadTexture("perkSupersize", "assets/perks/supersize_player.png");
 	s_Assets->LoadTexture("perkAddBall", "assets/perks/add_ball.png");
+	s_Assets->LoadTexture("perkDuplicateBall", "assets/perks/duplicate_ball.png");
 
 	// Just simple way to create some tiles, until it will be ready to create appropriate levels
 	for (int y = 0; y < 10; y++)
@@ -127,6 +128,7 @@ void App::Update()
 {
 	const SDL_FRect& playerPos = player->GetPos();
 
+	// Handling balls
 	for (const auto& b : balls)
 	{
 		const SDL_FRect& ballPos = b->GetPos();
@@ -154,19 +156,22 @@ void App::Update()
 				// Logic for hitted tile
 				// NOTE: Temporarily it's just destroying the tile
 				// TODO: Let's make some perks dropping from tiles in future
-				DropPerk(tilePos.x, tilePos.y);
 				t->Destroy();
+				DropPerk(tilePos.x, tilePos.y);
 
 				//App::s_Logger->Print(typeid(*this).name(), "Tile has been hitted");
 			}
 		}
 	}
 
+	// Handling perks
 	for (const auto& perk : perks)
 	{
 		if (SDL_HasIntersectionF(&perk->GetPos(), &player->GetPos()))
 		{
 			PerkTypes perkType = static_cast<Perk*>(perk)->GetType();
+
+			perk->Destroy();
 
 			switch (perkType)
 			{
@@ -177,28 +182,65 @@ void App::Update()
 				player->SetAffect(perkType);
 				break;
 			case PerkTypes::addball:
-			{
-				for (auto it = balls.rbegin(); it != balls.rend(); it++)
 				{
-					if (!(*it)->IsActive())
+					for (auto it = balls.rbegin(); it != balls.rend(); it++)
 					{
-						continue;
+						if (!(*it)->IsActive())
+						{
+							continue;
+						}
+
+						Velocity velocity = static_cast<Ball*>(*it)->GetVelocity();
+						velocity.x = -velocity.x;
+
+						velocity.y = std::abs(velocity.y);
+
+						if (std::abs(velocity.y) < App::s_MinSpeedY)
+						{
+							velocity.y = -App::s_MinSpeedY;
+						}
+
+						AddBall((*it)->GetPos().x + velocity.x, (*it)->GetPos().y, velocity);
+						break;
+					}
+				}
+				break;
+			case PerkTypes::duplicateball:
+				{
+					std::vector<Entity*> temporaryVector;
+
+					for (const auto& ball : balls)
+					{
+						if (!ball->IsActive())
+						{
+							continue;
+						}
+
+						temporaryVector.push_back(ball);
 					}
 
-					Velocity& velocity = static_cast<Ball*>(*it)->GetVelocity();
-					velocity.x = -velocity.x;
+					for (const auto& newBall : temporaryVector)
+					{
+						Velocity velocity = static_cast<Ball*>(newBall)->GetVelocity();
+						velocity.x = -velocity.x;
+						
+						velocity.y = std::abs(velocity.y);
 
-					AddBall((*it)->GetPos().x, (*it)->GetPos().y, velocity);
-					break;
+						if (std::abs(velocity.y) < App::s_MinSpeedY)
+						{
+							velocity.y = -App::s_MinSpeedY;
+						}
+
+						AddBall(newBall->GetPos().x + velocity.x, newBall->GetPos().y, velocity);
+					}
+
+					temporaryVector.clear();
 				}
-			}
-			break;
+				break;
 			case PerkTypes::none:
 			default:
 				break;
 			}
-
-			perk->Destroy();
 		}
 	}
 
@@ -235,7 +277,7 @@ void App::Render()
 
 void App::AddBall(float startX, float startY, Velocity velocity)
 {
-	if (balls.size() >= 15000) // limit for active balls
+	if (balls.size() >= 10000) // limit for active balls
 	{
 		s_Logger->Print(typeid(*this).name(), "Balls have reached their limit (" + std::to_string(balls.size()) + ")");
 		return;
@@ -251,6 +293,7 @@ void App::AddTile(const std::string& textureID, float posX, float posY)
 	tile->AddGroup(groupTiles);
 }
 
+// Don't need this anymore
 bool App::CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos)
 {
 	return (ballPos.y + ballPos.h / 2 >= entityPos.y
@@ -271,29 +314,37 @@ void App::DropPerk(float posX, float posY)
 	{
 		PerkTypes perkType = (PerkTypes)perkTypeOdds(e1);
 
+		std::string textureID = "";
+
 		switch (perkType)
 		{
 		case PerkTypes::shrink:
 			{
-				auto* perk = s_Manager->NewEntity<Perk>("perkShrink", posX, posY, perkType);
-				perk->AddGroup(groupPerks);
+				textureID = "perkShrink";
 			}
 			break;
 		case PerkTypes::supersize:
 			{
-				auto* perk = s_Manager->NewEntity<Perk>("perkSupersize", posX, posY, perkType);
-				perk->AddGroup(groupPerks);
+				textureID = "perkSupersize";
 			}
 			break;
 		case PerkTypes::addball:
 			{
-				auto* perk = s_Manager->NewEntity<Perk>("perkAddBall", posX, posY, perkType);
-				perk->AddGroup(groupPerks);
+				textureID = "perkAddBall";
 			}
 			break;
+		case PerkTypes::duplicateball:
+			{
+				textureID = "perkDuplicateBall";
+			}
+		break;
 		case PerkTypes::none:
 		default:
-			break;
+			return;
 		}
+
+		auto* perk = s_Manager->NewEntity<Perk>(textureID, posX, posY, perkType);
+		perk->AddGroup(groupPerks);
+
 	}
 }

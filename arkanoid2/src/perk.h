@@ -7,7 +7,8 @@ enum class PerkTypes
 	none = 0,
 	shrink,
 	supersize,
-	addball
+	addball,
+	duplicateball
 };
 
 class Perk : public Entity

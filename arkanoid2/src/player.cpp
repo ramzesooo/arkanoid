@@ -46,6 +46,7 @@ void Player::SetAffect(PerkTypes perkType)
 {
 	if (m_Affect == perkType)
 	{
+		m_EndTime = SDL_GetTicks() + App::s_AffectTime;
 		return;
 	}
 
