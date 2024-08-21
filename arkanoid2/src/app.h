@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <random>
 
 class Logger;
 class Entity;
@@ -33,19 +34,24 @@ public:
 
 	bool CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos);
 
+	// DropPerk() is responsible for the whole logic of checking the luck and drawing the perk
+	void DropPerk(float posX, float posY);
+
 	enum entityGroups : std::size_t
 	{
 		groupBalls = 0,
 		groupPlayers,
-		groupTiles
+		groupTiles,
+		groupPerks
 	};
 
 	static const uint32_t WINDOW_WIDTH;
 	static const uint32_t WINDOW_HEIGHT;
 
-	static float s_MaxSpeedX;
-	static float s_MinSpeedY;
-	static float s_TilesWidth;
+	static const uint32_t s_AffectTime; // time in ms
+	static const float s_MaxSpeedX;
+	static const float s_MinSpeedY;
+	static const float s_TilesWidth;
 	static SDL_Window* s_Window;
 	static SDL_Renderer* s_Renderer;
 	static Logger* s_Logger;
@@ -55,6 +61,5 @@ public:
 private:
 	Player* player = nullptr;
 	bool m_IsRunning = false;
-	/*std::vector<Ball*> balls;
-	std::vector<Tile*> tiles;*/
+	std::random_device rnd;
 };

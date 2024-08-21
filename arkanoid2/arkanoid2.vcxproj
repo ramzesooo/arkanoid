@@ -25,6 +25,7 @@
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\perk.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\tile.cpp" />
   </ItemGroup>
@@ -47,6 +48,7 @@
     <ClInclude Include="src\ball.h" />
     <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\log.h" />
+    <ClInclude Include="src\perk.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\tile.h" />
   </ItemGroup>

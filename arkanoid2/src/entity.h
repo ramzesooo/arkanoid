@@ -78,13 +78,13 @@ public:
 		}
 	}
 
-	void Draw()
+	/*void Draw()
 	{
 		for (const auto& e : entities)
 		{
 			e->Draw();
 		}
-	}
+	}*/
 
 	void AddToGroup(Entity* entity, std::size_t group)
 	{

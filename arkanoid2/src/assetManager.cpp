@@ -42,7 +42,7 @@ void AssetManager::LoadTexture(const std::string& textureID, const std::string& 
 
 	SDL_FreeSurface(tempSurface);
 
-	App::s_Logger->Debug(typeid(*this).name(), std::string("LoadTexture: Loaded" + textureID + " (" + path + ")"));
+	App::s_Logger->Debug(typeid(*this).name(), std::string("LoadTexture: Loaded " + textureID + " (" + path + ")"));
 }
 
 void AssetManager::DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_FRect& dest)

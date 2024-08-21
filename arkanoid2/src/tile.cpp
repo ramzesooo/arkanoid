@@ -9,10 +9,6 @@
 Tile::Tile(const std::string& textureID, float startX, float startY) 
 	: Entity(*App::s_Manager, { startX, startY, App::s_TilesWidth, 16 }), m_TextureID(textureID)
 {
-	//dest.x = startX;
-	//dest.y = startY;
-	//dest.w = App::s_TilesWidth;
-
 	App::s_Logger->LogConstructor(typeid(*this).name());
 }
 

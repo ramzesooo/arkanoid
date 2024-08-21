@@ -6,15 +6,17 @@
 #include "player.h"
 #include "ball.h"
 #include "tile.h"
+#include "perk.h"
 #include "assetManager.h"
 #include "app.h"
 
 const uint32_t App::WINDOW_WIDTH = 800;
 const uint32_t App::WINDOW_HEIGHT = 600;
 
-float App::s_MaxSpeedX = 2.0f;
-float App::s_MinSpeedY = 0.5f;
-float App::s_TilesWidth = (float)App::WINDOW_WIDTH / 16.0f;
+const uint32_t App::s_AffectTime = 15000; // time in ms
+const float App::s_MaxSpeedX = 2.0f;
+const float App::s_MinSpeedY = 0.5f;
+const float App::s_TilesWidth = (float)App::WINDOW_WIDTH / 16.0f;
 SDL_Window* App::s_Window = nullptr;
 SDL_Renderer* App::s_Renderer = nullptr;
 Logger* App::s_Logger = nullptr;
@@ -53,9 +55,16 @@ App::App()
 
 	// Prepare all needed textures for the game and hold it in unordered_map inside AssetManager class
 	// First string is ID of the texture necessary to draw it.
+
+	// Primary textures
 	s_Assets->LoadTexture("defaultBall", "assets/ball256x256.png");
 	s_Assets->LoadTexture("greenTile", "assets/green_tile.png");
 	s_Assets->LoadTexture("player", "assets/player64x32.png");
+
+	// Perks
+	s_Assets->LoadTexture("perkShrink", "assets/perks/shrink_player.png");
+	s_Assets->LoadTexture("perkSupersize", "assets/perks/supersize_player.png");
+	s_Assets->LoadTexture("perkAddBall", "assets/perks/add_ball.png");
 
 	// Just simple way to create some tiles, until it will be ready to create appropriate levels
 	for (int y = 0; y < 10; y++)
@@ -80,6 +89,7 @@ App::App()
 auto& balls = App::s_Manager->GetGroup(App::groupBalls);
 auto& players = App::s_Manager->GetGroup(App::groupPlayers);
 auto& tiles = App::s_Manager->GetGroup(App::groupTiles);
+auto& perks = App::s_Manager->GetGroup(App::groupPerks);
 
 App::~App()
 {
@@ -115,61 +125,6 @@ void App::EventHandler()
 
 void App::Update()
 {
-	// Refresh balls vector and manage all existing balls
-	//for (auto it = balls.begin(); it != balls.end();)
-	//{
-	//	if (*it && (*it)->IsActive())
-	//	{
-	//		const SDL_FRect& ballPos = (*it)->GetPos();
-
-	//		// Make the ball bounce after hitting a player
-	//		if (CheckCollisions(ballPos, playerPos))
-	//		{
-	//			Velocity& velocity = (*it)->GetVelocity();
-
-	//			float centerX = playerPos.x + playerPos.w / 2;
-	//			float centerY = playerPos.y + playerPos.h / 2;
-
-	//			// distance from the center of player
-	//			float distanceX = ((ballPos.x + ballPos.w / 2) - centerX) / (playerPos.w / 2);
-
-	//			velocity.x = distanceX * App::s_MaxSpeedX;
-
-	//			velocity.y = -std::abs(velocity.y);
-
-	//			if (std::abs(velocity.y) < App::s_MinSpeedY)
-	//			{
-	//				velocity.y = -App::s_MinSpeedY;
-	//			}
-
-	//			App::s_Logger->Print(typeid(*this).name(), std::to_string(velocity.x) + ", " + std::to_string(velocity.y));
-	//		}
-
-	//		it++;
-	//	}
-	//	else
-	//	{
-	//		it = balls.erase(it);
-	//	}
-	//}
-	// End of refreshing balls vector
-
-	// Refresh tiles vector and manage all existing tiles
-	/*for (auto it = tiles.begin(); it != tiles.end();)
-	{
-		if (*it && (*it)->IsActive())
-		{
-			it++;
-		}
-		else
-		{
-			it = tiles.erase(it);
-		}
-	}*/
-	// End of refreshing tiles vector
-
-	s_Manager->Refresh();
-
 	const SDL_FRect& playerPos = player->GetPos();
 
 	for (const auto& b : balls)
@@ -199,12 +154,55 @@ void App::Update()
 				// Logic for hitted tile
 				// NOTE: Temporarily it's just destroying the tile
 				// TODO: Let's make some perks dropping from tiles in future
+				DropPerk(tilePos.x, tilePos.y);
 				t->Destroy();
 
 				//App::s_Logger->Print(typeid(*this).name(), "Tile has been hitted");
 			}
 		}
 	}
+
+	for (const auto& perk : perks)
+	{
+		if (SDL_HasIntersectionF(&perk->GetPos(), &player->GetPos()))
+		{
+			PerkTypes perkType = static_cast<Perk*>(perk)->GetType();
+
+			switch (perkType)
+			{
+			case PerkTypes::shrink:
+				player->SetAffect(perkType);
+				break;
+			case PerkTypes::supersize:
+				player->SetAffect(perkType);
+				break;
+			case PerkTypes::addball:
+			{
+				for (auto it = balls.rbegin(); it != balls.rend(); it++)
+				{
+					if (!(*it)->IsActive())
+					{
+						continue;
+					}
+
+					Velocity& velocity = static_cast<Ball*>(*it)->GetVelocity();
+					velocity.x = -velocity.x;
+
+					AddBall((*it)->GetPos().x, (*it)->GetPos().y, velocity);
+					break;
+				}
+			}
+			break;
+			case PerkTypes::none:
+			default:
+				break;
+			}
+
+			perk->Destroy();
+		}
+	}
+
+	s_Manager->Refresh();
 	s_Manager->Update();
 }
 
@@ -212,20 +210,24 @@ void App::Render()
 {
 	SDL_RenderClear(s_Renderer);
 
-	//manager.Draw();
+	for (const auto& perk : perks)
+	{
+		perk->Draw();
+	}
+
 	for (const auto& t : tiles)
 	{
 		t->Draw();
 	}
 
-	for (const auto& b : balls)
-	{
-		b->Draw();
-	}
-
 	for (const auto& p : players)
 	{
 		p->Draw();
+	}
+
+	for (const auto& b : balls)
+	{
+		b->Draw();
 	}
 
 	SDL_RenderPresent(s_Renderer);
@@ -241,14 +243,12 @@ void App::AddBall(float startX, float startY, Velocity velocity)
 
 	auto* ball = s_Manager->NewEntity<Ball>(startX, startY, velocity);
 	ball->AddGroup(groupBalls);
-	//balls.push_back(ball);
 }
 
 void App::AddTile(const std::string& textureID, float posX, float posY)
 {
 	auto* tile = s_Manager->NewEntity<Tile>(textureID, posX, posY);
 	tile->AddGroup(groupTiles);
-	//tiles.push_back(tile);
 }
 
 bool App::CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos)
@@ -257,4 +257,43 @@ bool App::CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos)
 		&& ballPos.y <= entityPos.y + entityPos.h
 		&& ballPos.x + ballPos.w / 2 >= entityPos.x
 		&& ballPos.x <= entityPos.x + entityPos.w);
+}
+
+void App::DropPerk(float posX, float posY)
+{
+	// Get the odds
+	std::default_random_engine e1(rnd());
+	std::uniform_int_distribution<uint32_t> odds(1, 100);
+	std::uniform_int_distribution<uint32_t> perkTypeOdds(1, 5);
+
+	// from 1 to 10 is 10% from 100 numbers
+	if (odds(e1) <= 10)
+	{
+		PerkTypes perkType = (PerkTypes)perkTypeOdds(e1);
+
+		switch (perkType)
+		{
+		case PerkTypes::shrink:
+			{
+				auto* perk = s_Manager->NewEntity<Perk>("perkShrink", posX, posY, perkType);
+				perk->AddGroup(groupPerks);
+			}
+			break;
+		case PerkTypes::supersize:
+			{
+				auto* perk = s_Manager->NewEntity<Perk>("perkSupersize", posX, posY, perkType);
+				perk->AddGroup(groupPerks);
+			}
+			break;
+		case PerkTypes::addball:
+			{
+				auto* perk = s_Manager->NewEntity<Perk>("perkAddBall", posX, posY, perkType);
+				perk->AddGroup(groupPerks);
+			}
+			break;
+		case PerkTypes::none:
+		default:
+			break;
+		}
+	}
 }
