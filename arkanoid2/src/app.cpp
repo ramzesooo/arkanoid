@@ -69,7 +69,7 @@ App::App()
 	s_Assets->LoadTexture("perkUnknown", "assets/perks/unknown_perk.png");
 
 	// Just simple way to create some tiles, until it will be ready to create appropriate levels
-	for (int y = 0; y < 10; y++)
+	for (int y = 0; y < 14; y++)
 	{
 		for (int x = 0; x < 16; x++)
 		{
@@ -77,8 +77,8 @@ App::App()
 		}
 	}
 
-	for (int i = 0; i < 10; ++i)
-		AddBall((float)WINDOW_WIDTH / 2, ((float)WINDOW_HEIGHT / 2) + i, { 0.0f, 1.0f });
+	//for (int i = 0; i < 100; ++i)
+	AddBall((float)WINDOW_WIDTH / 2, ((float)WINDOW_HEIGHT / 2), { 0.0f, 1.0f });
 
 	player = s_Manager->NewEntity<Player>();
 	player->AddGroup(groupPlayers);
@@ -185,8 +185,6 @@ void App::Update()
 		switch (perkType)
 		{
 		case PerkTypes::shrink:
-			player->SetAffect(perkType);
-			break;
 		case PerkTypes::supersize:
 			player->SetAffect(perkType);
 			break;
@@ -202,17 +200,7 @@ void App::Update()
 					Velocity velocity = static_cast<Ball*>(*it)->GetVelocity();
 					velocity.x = -velocity.x;
 
-					velocity.y = std::abs(velocity.y);
-
-					if (std::abs(velocity.y) < App::s_MinSpeedY)
-					{
-						velocity.y = -App::s_MinSpeedY;
-					}
-
-					//float posX = (player->GetPos().x + player->GetPos().w / 2);
-					//float posY = (float)App::WINDOW_HEIGHT / 2;
-
-					AddBall((*it)->GetPos().x + velocity.x, (*it)->GetPos().y, velocity);
+					AddBall((*it)->GetPos().x + velocity.x, (*it)->GetPos().y - 1.0f, velocity);
 					break;
 				}
 			}
@@ -235,18 +223,9 @@ void App::Update()
 				{
 					Velocity velocity = static_cast<Ball*>(newBall)->GetVelocity();
 					velocity.x = -velocity.x;
-						
-					velocity.y = std::abs(velocity.y);
 
-					if (std::abs(velocity.y) < App::s_MinSpeedY)
-					{
-						velocity.y = -App::s_MinSpeedY;
-					}
-
-					AddBall(newBall->GetPos().x + velocity.x, newBall->GetPos().y, velocity);
+					AddBall(newBall->GetPos().x + velocity.x, newBall->GetPos().y - 0.333f, velocity);
 				}
-
-				temporaryVector.clear();
 			}
 			break;
 		// unknown perks have assigned another perk type, so there is a bug if it has been drawn
