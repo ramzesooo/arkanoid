@@ -25,7 +25,7 @@ void Perk::Update()
 	}
 	else
 	{
-		dest.y += 0.5f;
+		dest.y += (0.333f);
 	}
 }
 

@@ -8,7 +8,8 @@ enum class PerkTypes
 	shrink,
 	supersize,
 	addball,
-	duplicateball
+	duplicateball,
+	unknownperk
 };
 
 class Perk : public Entity
