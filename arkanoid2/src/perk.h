@@ -9,13 +9,14 @@ enum class PerkType
 	shrink,
 	supersize,
 	addball,
-	duplicateball
+	duplicateball,
+	size
 };
 
 class Perk : public Entity
 {
 public:
-	Perk(std::string_view textureID, float startX, float startY, PerkType perkType);
+	Perk(const std::string_view& textureID, float startX, float startY, PerkType perkType);
 
 	void Update() override;
 	void Draw() override;
@@ -23,6 +24,6 @@ public:
 	const PerkType& GetType() const { return m_PerkType; }
 private:
 	PerkType m_PerkType;
-	std::string m_TextureID;
+	std::string m_TextureID = "";
 	static constexpr SDL_Rect perk_source{ 0, 0, 64, 64 };
 };

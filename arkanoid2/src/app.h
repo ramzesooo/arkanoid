@@ -30,8 +30,6 @@ public:
 
 	void AddTile(std::string_view textureID, float posX, float posY);
 
-	bool CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos);
-
 	inline std::string_view textureOf(PerkType type) {
 		using enum PerkType;
 		switch (type) {

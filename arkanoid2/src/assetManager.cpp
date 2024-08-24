@@ -4,16 +4,11 @@
 
 #include "SDL_image.h"
 
-AssetManager::AssetManager()
-{
-	App::s_Logger->LogConstructor(typeid(*this).name());
-}
-
 AssetManager::~AssetManager()
 {
 	for (auto& texture : textures)
 	{
-		App::s_Logger->Print(typeid(*this).name(), std::string("Destroying texture ") + (std::string)texture.first);
+		App::s_Logger->Print(typeid(*this).name(), std::string("Destroying texture ") + texture.first);
 		SDL_DestroyTexture(texture.second);
 	}
 
@@ -46,6 +41,7 @@ void AssetManager::LoadTexture(const std::string& textureID, const std::string& 
 
 void AssetManager::DrawTexture(const std::string& textureID, const SDL_Rect& src, const SDL_FRect& dest)
 {
+	// returns 0 on success
 	if (SDL_RenderCopyExF(App::s_Renderer, textures[textureID], &src, &dest, NULL, NULL, SDL_FLIP_NONE) != 0)
 	{
 		App::s_Logger->LogSDL("DrawTexture: ");

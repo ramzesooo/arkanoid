@@ -5,7 +5,7 @@
 
 #include "SDL.h"
 
-Perk::Perk(std::string_view textureID, float startX, float startY, PerkType perkType)
+Perk::Perk(const std::string_view& textureID, float startX, float startY, PerkType perkType)
 	: Entity(*App::s_Manager, { startX, startY, 20.0f, 20.0f }), m_TextureID(static_cast<std::string>(textureID)), m_PerkType(perkType)
 {
 	AddGroup(EntityGroup::perks);

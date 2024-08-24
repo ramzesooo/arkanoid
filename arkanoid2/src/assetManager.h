@@ -7,7 +7,6 @@
 class AssetManager
 {
 public:
-	AssetManager();
 	~AssetManager();
 
 	void LoadTexture(const std::string& textureID, const std::string& path);

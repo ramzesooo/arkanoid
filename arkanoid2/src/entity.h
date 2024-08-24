@@ -112,6 +112,8 @@ public:
 		return (T*)entities.back().get();
 	}
 
+	std::size_t GetEntitiesAmount() const { return entities.size(); }
+
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
 	std::array<std::vector<Entity*>, entityGroupSize> groupedEntities;

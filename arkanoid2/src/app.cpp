@@ -72,7 +72,7 @@ App::App()
 		}
 	}
 
-	for (int i = 0; i < 1000; ++i)
+	for (int i = 0; i < 100; ++i)
 		AddBall((float)WINDOW_WIDTH / 2, ((float)WINDOW_HEIGHT / 2) + (0.5f * i), {0.0f, 1.0f});
 
 	player = s_Manager->NewEntity<Player>();
@@ -91,6 +91,11 @@ auto& perks = App::s_Manager->GetGroup(EntityGroup::perks);
 App::~App()
 {
 	delete App::s_Assets;
+
+	App::s_Logger->Print(typeid(*this).name(), std::string("Balls: ") + std::to_string(balls.size()));
+	App::s_Logger->Print(typeid(*this).name(), std::string("Tiles: ") + std::to_string(tiles.size()));
+	App::s_Logger->Print(typeid(*this).name(), std::string("Perks: ") + std::to_string(perks.size()));
+	App::s_Logger->Print(typeid(*App::s_Manager).name(), std::string("Entities: ") + std::to_string(App::s_Manager->GetEntitiesAmount()));
 
 	SDL_DestroyRenderer(s_Renderer);
 	SDL_DestroyWindow(s_Window);
@@ -118,13 +123,13 @@ void App::EventHandler()
 		{
 			std::string_view textureID = textureOf(PerkType::duplicateball);
 
-			s_Manager->NewEntity<Perk>(textureID, player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 100, PerkType::duplicateball);
+			s_Manager->NewEntity<Perk>(textureID, player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 50, PerkType::duplicateball);
 		}
 		else if (s_Event.key.keysym.sym == SDLK_F2)
 		{
 			std::string_view textureID = textureOf(PerkType::addball);
 
-			s_Manager->NewEntity<Perk>(textureID, player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 100, PerkType::addball);
+			s_Manager->NewEntity<Perk>(textureID, player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 50, PerkType::addball);
 		}
 		else if (s_Event.key.keysym.sym == SDLK_F3)
 		{
@@ -183,8 +188,8 @@ void App::Update()
 				// Make the ball bouncing
 				static_cast<Ball*>(b)->HitTile(tilePos);
 
-				t->Destroy();
 				DropPerk(tilePos.x, tilePos.y);
+				t->Destroy();
 			}
 		}
 	}
@@ -192,7 +197,7 @@ void App::Update()
 	// Handling perks
 	for (const auto& perk : perks)
 	{
-		if (!SDL_HasIntersectionF(&perk->GetPos(), &player->GetPos()) || !perk->IsActive())
+		if (!perk->IsActive() || !SDL_HasIntersectionF(&perk->GetPos(), &player->GetPos()))
 		{
 			continue;
 		}
@@ -237,7 +242,34 @@ void App::Update()
 			break;
 		case PerkType::duplicateball:
 			{
-				std::vector<Entity*> temporaryVector;
+				// just save place of an element instead of inserting element
+				std::vector<std::size_t> temporaryVector;
+
+				for (std::size_t i = 0; i < balls.size(); i++)
+				{
+					if (!balls[i]->IsActive())
+					{
+						continue;
+					}
+
+					temporaryVector.push_back(i);
+				}
+
+				for (const auto& ball : temporaryVector)
+				{
+					const SDL_FRect pos = balls[ball]->GetPos();
+					Velocity velocity = static_cast<Ball*>(balls[ball])->GetVelocity();
+					velocity.x = -velocity.x;
+
+					if (velocity.y > 0.0f)
+					{
+						velocity.y = -velocity.y;
+					}
+
+					AddBall(pos.x + velocity.x, pos.y, velocity);
+				}
+
+				/*std::vector<Entity*> temporaryVector;
 
 				for (const auto& ball : balls)
 				{
@@ -253,7 +285,7 @@ void App::Update()
 
 				for (const auto& newBall : temporaryVector)
 				{
-					SDL_FRect pos = newBall->GetPos();
+					const SDL_FRect pos = newBall->GetPos();
 					Velocity velocity = static_cast<Ball*>(newBall)->GetVelocity();
 					velocity.x = -velocity.x;
 
@@ -265,7 +297,7 @@ void App::Update()
 					AddBall(pos.x + velocity.x, pos.y, velocity);
 				}
 
-				temporaryVector.clear();
+				temporaryVector.clear();*/
 			}
 			break;
 		default:
@@ -314,8 +346,6 @@ void App::AddBall(float startX, float startY, Velocity velocity)
 
 	s_Manager->NewEntity<Ball>(startX, startY, velocity);
 
-	s_Logger->Print(typeid(*this).name(), "Balls amount: " + std::to_string(balls.size()));
-
 	//auto* ball = s_Manager->NewEntity<Ball>(startX, startY, velocity);
 	//ball->AddGroup(EntityGroup::balls);
 }
@@ -328,22 +358,13 @@ void App::AddTile(std::string_view textureID, float posX, float posY)
 	//tile->AddGroup(EntityGroup::tiles);
 }
 
-// Don't need this anymore
-bool App::CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos)
-{
-	return (ballPos.y + ballPos.h / 2 >= entityPos.y
-		&& ballPos.y <= entityPos.y + entityPos.h
-		&& ballPos.x + ballPos.w / 2 >= entityPos.x
-		&& ballPos.x <= entityPos.x + entityPos.w);
-}
-
 void App::DropPerk(float posX, float posY)
 {
 	static std::default_random_engine rng(rnd());
 	static std::uniform_real_distribution<float> realDistr(0, 1);
 
 	// Should be appropriate to the count of perk types
-	static std::uniform_int_distribution<uint32_t> perkTypeDistr(1, 4);
+	static std::uniform_int_distribution<uint32_t> perkTypeDistr(1, (uint32_t)PerkType::size - 1);
 
 	// probability that a perk drops among tiles
 	constexpr float perkDropChance = 0.15f;
