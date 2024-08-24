@@ -1,18 +1,16 @@
 #pragma once
+#include "entity.h"
+#include "player.h"
+#include "tile.h"
+#include "ball.h"
+#include "perk.h"
+#include "log.h"
+
 #include "SDL.h"
 #include <vector>
 #include <string>
 #include <memory>
 #include <random>
-
-class Logger;
-class Entity;
-class Ball;
-class Tile;
-class Player;
-class Manager;
-
-struct Velocity;
 
 class App
 {
@@ -30,20 +28,23 @@ public:
 
 	void AddBall(float startX, float startY, Velocity velocity);
 
-	void AddTile(const std::string& textureID, float posX, float posY);
+	void AddTile(std::string_view textureID, float posX, float posY);
 
 	bool CheckCollisions(const SDL_FRect& ballPos, const SDL_FRect& entityPos);
 
+	inline std::string_view textureOf(PerkType type) {
+		using enum PerkType;
+		switch (type) {
+		case shrink: return "perkShrink";
+		case supersize: return "perkSupersize";
+		case addball: return "perkAddBall";
+		case duplicateball: return "perkDuplicateBall";
+		}
+		return "perkNone";
+	}
+
 	// DropPerk() is responsible for the whole logic of checking the luck and drawing the perk
 	void DropPerk(float posX, float posY);
-
-	enum entityGroups : std::size_t
-	{
-		groupBalls = 0,
-		groupPlayers,
-		groupTiles,
-		groupPerks
-	};
 
 	static const uint32_t WINDOW_WIDTH;
 	static const uint32_t WINDOW_HEIGHT;

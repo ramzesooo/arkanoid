@@ -1,14 +1,13 @@
-#include "SDL.h"
-#include "assetManager.h"
-#include "app.h"
-#include "log.h"
-#include "entity.h"
 #include "tile.h"
-#include <typeinfo>
+#include "assetManager.h"
+#include "log.h"
+#include "app.h"
 
-Tile::Tile(const std::string& textureID, float startX, float startY) 
-	: Entity(*App::s_Manager, { startX, startY, App::s_TilesWidth, 16 }), m_TextureID(textureID)
+Tile::Tile(std::string_view textureID, float startX, float startY) 
+	: Entity(*App::s_Manager, { startX, startY, App::s_TilesWidth, 16 }), m_TextureID(static_cast<std::string>(textureID))
 {
+	AddGroup(EntityGroup::tiles);
+
 	App::s_Logger->LogConstructor(typeid(*this).name());
 }
 

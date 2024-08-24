@@ -1,12 +1,21 @@
 #pragma once
+#include "SDL.h"
 #include <vector>
-#include <typeinfo>
 #include <string>
 #include <memory>
 #include <bitset>
 #include <array>
 
-constexpr std::size_t maxGroups = 8;
+enum class EntityGroup
+{
+	balls = 0,
+	players,
+	tiles,
+	perks,
+	size
+};
+
+constexpr std::size_t entityGroupSize = static_cast<std::size_t>(EntityGroup::size);
 
 class Manager;
 
@@ -19,21 +28,21 @@ public:
 	virtual void Update() {}
 	virtual void Draw() {}
 
-	const SDL_FRect& GetPos() { return dest; }
+	const SDL_FRect& GetPos() const { return dest; }
 
 	void Destroy() { m_IsActive = false; }
 
 	bool IsActive() const { return m_IsActive; }
 
-	bool HasGroup(std::size_t group) const { return m_GroupBitSet[group]; }
-	void AddGroup(std::size_t group);
-	void DeleteGroup(std::size_t group) { m_GroupBitSet[group] = false; }
+	bool HasGroup(EntityGroup group) const { return m_GroupBitSet[static_cast<std::size_t>(group)]; }
+	void AddGroup(EntityGroup group);
+	void DeleteGroup(EntityGroup group) { m_GroupBitSet[static_cast<std::size_t>(group)] = false; }
 protected:
 	SDL_FRect dest{ .0f, .0f, .0f, .0f };
 private:
 	bool m_IsActive = true;
 	Manager& m_Manager;
-	std::bitset<maxGroups> m_GroupBitSet;
+	std::bitset<entityGroupSize> m_GroupBitSet;
 };
 
 class Manager
@@ -42,7 +51,7 @@ public:
 	// Refreshes vector of unique pointers to all existing Entities
 	void Refresh()
 	{
-		for (auto i(0u); i < maxGroups; i++)
+		for (auto i(0u); i < entityGroupSize; i++)
 		{
 			for (auto it = groupedEntities[i].begin(); it != groupedEntities[i].end();)
 			{
@@ -86,14 +95,14 @@ public:
 		}
 	}*/
 
-	void AddToGroup(Entity* entity, std::size_t group)
+	void AddToGroup(Entity* entity, EntityGroup group)
 	{
-		groupedEntities[group].emplace_back(entity);
+		groupedEntities[static_cast<std::size_t>(group)].emplace_back(entity);
 	}
 
-	std::vector<Entity*>& GetGroup(std::size_t group)
+	std::vector<Entity*>& GetGroup(EntityGroup group)
 	{
-		return groupedEntities[group];
+		return groupedEntities[static_cast<std::size_t>(group)];
 	}
 
 	template<class T, class... Args>
@@ -105,5 +114,5 @@ public:
 
 private:
 	std::vector<std::unique_ptr<Entity>> entities;
-	std::array<std::vector<Entity*>, maxGroups> groupedEntities;
+	std::array<std::vector<Entity*>, entityGroupSize> groupedEntities;
 };

@@ -1,9 +1,8 @@
+#include "ball.h"
 #include "SDL.h"
 #include "assetManager.h"
 #include "app.h"
 #include "log.h"
-#include "entity.h"
-#include "ball.h"
 
 Ball::Ball(float startX, float startY, Velocity startVelocity) 
 	: Entity(*App::s_Manager, { startX, startY, 12.0f, 12.0f }), velocity(startVelocity)
@@ -11,7 +10,7 @@ Ball::Ball(float startX, float startY, Velocity startVelocity)
 	dest.x = startX;
 	dest.y = startY;
 
-	App::s_Logger->LogConstructor(typeid(*this).name());
+	AddGroup(EntityGroup::balls);
 }
 
 void Ball::Draw()
@@ -21,18 +20,15 @@ void Ball::Draw()
 
 void Ball::Update()
 {
-	uint32_t screenW = App::WINDOW_WIDTH;
-	uint32_t screenH = App::WINDOW_HEIGHT;
-
-	if (dest.x + dest.w > screenW)
-	{
-		velocity.x = -velocity.x;
-	}
-
-	if (dest.y >= screenH)
+	if (dest.y >= App::WINDOW_HEIGHT)
 	{
 		Destroy();
 		return;
+	}
+
+	if (dest.x + dest.w > App::WINDOW_WIDTH)
+	{
+		velocity.x = -velocity.x;
 	}
 
 	if (dest.x <= 0)

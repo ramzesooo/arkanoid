@@ -1,31 +1,23 @@
-#include "SDL.h"
+#include "perk.h"
 #include "assetManager.h"
 #include "app.h"
 #include "log.h"
-#include "entity.h"
-#include "perk.h"
-#include <typeinfo>
 
-Perk::Perk(const std::string& textureID, float startX, float startY, PerkTypes perkType)
-	: Entity(*App::s_Manager, { startX, startY, 20.0f, 20.0f }), m_TextureID(textureID), m_PerkType(perkType)
-{
-	App::s_Logger->LogConstructor(typeid(*this).name());
-}
+#include "SDL.h"
 
-Perk::~Perk()
+Perk::Perk(std::string_view textureID, float startX, float startY, PerkType perkType)
+	: Entity(*App::s_Manager, { startX, startY, 20.0f, 20.0f }), m_TextureID(static_cast<std::string>(textureID)), m_PerkType(perkType)
 {
-	App::s_Logger->LogDestructor(typeid(*this).name());
+	AddGroup(EntityGroup::perks);
 }
 
 void Perk::Update()
 {
+	dest.y += 0.3f;
+
 	if (dest.y >= (float)App::WINDOW_HEIGHT)
 	{
 		Destroy();
-	}
-	else
-	{
-		dest.y += (0.333f);
 	}
 }
 

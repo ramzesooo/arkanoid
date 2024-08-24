@@ -1,4 +1,5 @@
 #pragma once
+#include "entity.h"
 #include "perk.h"
 
 class Player : public Entity
@@ -9,10 +10,13 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	void SetAffect(PerkTypes perkType);
+	void SetAffect(PerkType perkType);
 
-	const PerkTypes& GetAffect() const { return m_Affect; }
+	const PerkType& GetAffect() const { return m_Affect; }
 	void CancelAffect();
+
+	void SetInvisible() { m_Invisible = !m_Invisible; }
+	bool GetInvisible() const { return m_Invisible; }
 private:
 	static constexpr SDL_Rect player_source{ 0, 0, 64, 32 };
 
@@ -21,5 +25,7 @@ private:
 	//double m_EndTime = NULL;
 	uint32_t m_EndTime = NULL;
 
-	PerkTypes m_Affect = PerkTypes::none;
+	PerkType m_Affect = PerkType::none;
+
+	bool m_Invisible = false;
 };

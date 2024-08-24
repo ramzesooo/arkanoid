@@ -1,29 +1,28 @@
 #pragma once
+#include "entity.h"
 
-class Entity;
+#include <string>
 
-enum class PerkTypes
+enum class PerkType
 {
 	none = 0,
 	shrink,
 	supersize,
 	addball,
-	duplicateball,
-	unknownperk
+	duplicateball
 };
 
 class Perk : public Entity
 {
 public:
-	Perk(const std::string& textureID, float startX, float startY, PerkTypes perkType);
-	~Perk();
+	Perk(std::string_view textureID, float startX, float startY, PerkType perkType);
 
 	void Update() override;
 	void Draw() override;
 
-	const PerkTypes& GetType() const { return m_PerkType; }
+	const PerkType& GetType() const { return m_PerkType; }
 private:
-	PerkTypes m_PerkType;
+	PerkType m_PerkType;
 	std::string m_TextureID;
 	static constexpr SDL_Rect perk_source{ 0, 0, 64, 64 };
 };

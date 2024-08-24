@@ -1,12 +1,13 @@
 #pragma once
-#include <string>
+#include "entity.h"
 
-class Entity;
+#include "SDL.h"
+#include <string>
 
 class Tile : public Entity
 {
 public:
-	Tile(const std::string& textureID, float startX, float startY);
+	Tile(std::string_view textureID, float startX, float startY);
 
 	void Update() override;
 	void Draw() override;

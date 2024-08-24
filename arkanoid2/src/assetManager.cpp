@@ -1,9 +1,8 @@
-#include "SDL.h"
-#include "SDL_image.h"
 #include "assetManager.h"
 #include "app.h"
-#include <typeinfo>
 #include "log.h"
+
+#include "SDL_image.h"
 
 AssetManager::AssetManager()
 {
@@ -14,7 +13,7 @@ AssetManager::~AssetManager()
 {
 	for (auto& texture : textures)
 	{
-		App::s_Logger->Print(typeid(*this).name(), std::string("Destroying texture ") + texture.first);
+		App::s_Logger->Print(typeid(*this).name(), std::string("Destroying texture ") + (std::string)texture.first);
 		SDL_DestroyTexture(texture.second);
 	}
 

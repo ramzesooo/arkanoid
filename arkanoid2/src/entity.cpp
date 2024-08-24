@@ -1,8 +1,7 @@
-#include "SDL.h"
 #include "entity.h"
 
-void Entity::AddGroup(std::size_t group)
+void Entity::AddGroup(EntityGroup group)
 {
-	m_GroupBitSet[group] = true;
+	m_GroupBitSet[static_cast<std::size_t>(group)] = true;
 	m_Manager.AddToGroup(this, group);
 }

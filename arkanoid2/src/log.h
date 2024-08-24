@@ -1,10 +1,6 @@
 #pragma once
 #include <string>
-
-class Ball;
-class Entity;
-class Manager;
-class App;
+#include <typeinfo>
 
 class Logger
 {
