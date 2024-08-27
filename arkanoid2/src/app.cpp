@@ -426,17 +426,22 @@ void App::DropPerk(float posX, float posY)
 
 void App::LoadLevel()
 {
+	if (currentLevelID < 0)
+	{
+		currentLevelID = 0;
+	}
+
 	if (currentLevelID >= amountOfLevels)
 	{
 		App::s_Logger->Print(typeid(*this).name(), std::string("Level ") + std::to_string(currentLevelID) + " doesn't exist");
-		currentLevelID = 0;
+		currentLevelID = -1;
 		return;
 	}
 
 	if (!levels.at(currentLevelID) || levels.at(currentLevelID)->m_IsFailed)
 	{
 		App::s_Logger->Print(typeid(levels.at(currentLevelID)).name(), std::string("Couldn't load level ") + std::to_string(currentLevelID));
-		currentLevelID = 0;
+		currentLevelID = -1;
 		return;
 	}
 
@@ -480,4 +485,6 @@ void App::LoadLevel()
 			AddTile(tileType, (x * App::s_TilesWidth), (y * 16.0f));
 		}
 	}
+
+	AddBall((float)App::WINDOW_WIDTH / 2, (float)App::WINDOW_HEIGHT / 2, 0.0f, 1.0f);
 }

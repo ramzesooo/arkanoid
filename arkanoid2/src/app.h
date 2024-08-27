@@ -93,6 +93,6 @@ private:
 	bool m_IsRunning = false;
 	std::random_device rnd;
 
-	std::size_t currentLevelID = 0;
+	int32_t currentLevelID = 0;
 	std::vector<std::unique_ptr<Level>> levels;
 };
