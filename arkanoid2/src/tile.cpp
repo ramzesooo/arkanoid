@@ -3,12 +3,10 @@
 #include "log.h"
 #include "app.h"
 
-Tile::Tile(std::string_view textureID, float startX, float startY) 
-	: Entity(*App::s_Manager, { startX, startY, App::s_TilesWidth, 16 }), m_TextureID(textureID)
+Tile::Tile(std::string_view textureID, TileType type, float startX, float startY) 
+	: Entity(*App::s_Manager, { startX, startY, App::s_TilesWidth, 16 }), m_TextureID(textureID), m_Type(type)
 {
 	AddGroup(EntityGroup::tiles);
-
-	//App::s_Logger->LogConstructor(typeid(*this).name());
 }
 
 //void Tile::Update()

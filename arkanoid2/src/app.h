@@ -18,6 +18,7 @@ constexpr uint16_t amountOfLevels = 2;
 struct Level
 {
 	std::vector<std::vector<TileType>> levelData;
+	bool m_IsFailed = false;
 };
 
 class App
@@ -37,7 +38,7 @@ public:
 
 
 	void AddBall(float startX, float startY, float velocityX, float velocityY);
-	void AddTile(std::string_view textureID, float posX, float posY);
+	void AddTile(TileType type, float posX, float posY);
 
 	// DropPerk() is responsible for whole logic of checking the luck and drawing the perk
 	void DropPerk(float posX, float posY);
@@ -91,5 +92,4 @@ private:
 
 	std::size_t currentLevelID = 0;
 	std::vector<std::unique_ptr<Level>> levels;
-	//std::unordered_map<uint16_t, std::unique_ptr<Level>> levels;
 };
