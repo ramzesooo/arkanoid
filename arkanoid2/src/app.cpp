@@ -81,13 +81,18 @@ App::App()
 		{
 			std::ifstream levelFile(levelDir + std::to_string(i) + levelExtension);
 
+			// struct Level is defined in app.h
+			// Its only contain is std::vector<std::vector<TileType>> levelData and bool m_IsFailed
+
+			//levels[i] = std::move(std::unique_ptr<Level>());
+			levels.emplace_back(std::move(std::make_unique<Level>()));
+
 			if (levelFile.fail())
 			{
 				s_Logger->Print(typeid(*this).name(), std::to_string(i) + levelExtension + " couldn't be find");
+				levels.back().get()->m_IsFailed = true;
 				continue;
 			}
-
-			std::unique_ptr<Level> newLevel = std::make_unique<Level>();
 
 			std::string line;
 
@@ -100,21 +105,28 @@ App::App()
 					row.push_back((TileType)std::stoi(value));
 				}
 
-				newLevel->levelData.push_back(row);
+				levels.back().get()->levelData.push_back(row);
 			}
-
-			//levels.emplace(i, std::move(newLevel));
-			levels.emplace_back(std::move(newLevel));
 		}
 	}
 
-	Level* currentLevel = levels.at(currentLevelID).get();
-
-	for (uint32_t y = 0; y < 15; y++)
 	{
-		for (uint32_t x = 0; x < 20; x++)
+		Level* currentLevel = levels.at(currentLevelID).get();
+		TileType tileType;
+
+		for (uint32_t y = 0; y < 15; y++)
 		{
-			AddTile(TextureOfTile(currentLevel->levelData.at(y).at(x)), (x * App::s_TilesWidth), (y * 16.0f));
+			for (uint32_t x = 0; x < 20; x++)
+			{
+				tileType = currentLevel->levelData.at(y).at(x);
+
+				if (!(uint32_t)tileType)
+				{
+					continue;
+				}
+
+				AddTile(currentLevel->levelData.at(y).at(x), (x * App::s_TilesWidth), (y * 16.0f));
+			}
 		}
 	}
 
@@ -122,7 +134,6 @@ App::App()
 	AddBall((float)App::WINDOW_WIDTH / 2, ((float)App::WINDOW_HEIGHT / 2), 0.0f, 1.0f);
 
 	player = s_Manager->NewEntity<Player>();
-	//player->AddGroup(EntityGroup::players);
 
 	m_IsRunning = initialized;
 
@@ -138,6 +149,7 @@ App::~App()
 {
 	delete App::s_Assets;
 
+	s_Logger->Print(typeid(*this).name(), std::string("Levels: ") + std::to_string(levels.size()));
 	s_Logger->Print(typeid(*this).name(), std::string("Balls: ") + std::to_string(balls.size()));
 	s_Logger->Print(typeid(*this).name(), std::string("Tiles: ") + std::to_string(tiles.size()));
 	s_Logger->Print(typeid(*this).name(), std::string("Perks: ") + std::to_string(perks.size()));
@@ -237,6 +249,11 @@ void App::Update()
 			{
 				// Make the ball bouncing
 				static_cast<Ball*>(b)->HitTile(tilePos);
+
+				if (static_cast<Tile*>(t)->GetType() == TileType::wall)
+				{
+					continue;
+				}
 
 				DropPerk(tilePos.x, tilePos.y);
 				t->Destroy();
@@ -339,17 +356,11 @@ void App::AddBall(float startX, float startY, float velocityX, float velocityY)
 	//}
 
 	s_Manager->NewEntity<Ball>(startX, startY, velocityX, velocityY);
-
-	//auto* ball = s_Manager->NewEntity<Ball>(startX, startY, velocity);
-	//ball->AddGroup(EntityGroup::balls);
 }
 
-void App::AddTile(std::string_view textureID, float posX, float posY)
+void App::AddTile(TileType type, float posX, float posY)
 {
-	s_Manager->NewEntity<Tile>(textureID, posX, posY);
-
-	//auto* tile = s_Manager->NewEntity<Tile>(textureID, posX, posY);
-	//tile->AddGroup(EntityGroup::tiles);
+	s_Manager->NewEntity<Tile>(TextureOfTile(type), type, posX, posY);
 }
 
 void App::DropPerk(float posX, float posY)
@@ -361,8 +372,8 @@ void App::DropPerk(float posX, float posY)
 	static std::uniform_int_distribution<uint32_t> perkTypeDistr(1, (uint32_t)PerkType::size - 1);
 
 	// probability that a perk drops among tiles
-	constexpr float perkDropChance = 0.20f;
-	// probability that a perk has a visible texture
+	constexpr float perkDropChance = 0.15f;
+	// probability that a perk has a hidden texture
 	constexpr float perkHideChance = 0.20f;
 
 	bool showTexture = true;
@@ -377,8 +388,5 @@ void App::DropPerk(float posX, float posY)
 		std::string_view textureID = showTexture ? TextureOfPerk(perkType) : "perkHidden";
 
 		s_Manager->NewEntity<Perk>(textureID, posX, posY, perkType);
-
-		//auto* perk = s_Manager->NewEntity<Perk>(textureID, posX, posY, perkType);
-		//perk->AddGroup(EntityGroup::perks);
 	}
 }
