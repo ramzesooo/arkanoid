@@ -12,7 +12,7 @@
 const uint32_t App::WINDOW_WIDTH = 800;
 const uint32_t App::WINDOW_HEIGHT = 600;
 
-const uint32_t App::s_AffectTime = 10500; // time in ms
+const uint32_t App::s_AffectTime = 9000; // time in ms
 const float App::s_MaxSpeedX = 2.0f;
 const float App::s_MinSpeedY = 0.5f;
 const float App::s_TilesWidth = (float)App::WINDOW_WIDTH / 20.0f;
@@ -202,9 +202,14 @@ void App::EventHandler()
 			case SDLK_F4:
 				App::s_Manager->NewEntity<Perk>(TextureOfPerk(PerkType::floor), player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 30.0f, PerkType::floor);
 				break;
+				// Load next level
 			case SDLK_F5:
 				currentLevelID++;
 				LoadLevel();
+				break;
+				// Drop supersize perk
+			case SDLK_F6:
+				App::s_Manager->NewEntity<Perk>(TextureOfPerk(PerkType::supersize), player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 30.0f, PerkType::supersize);
 				break;
 				// spawn ball directly in the middle
 			case SDLK_F10:

@@ -60,20 +60,20 @@ void Player::SetAffect(PerkType perkType)
 	switch (perkType)
 	{
 	case PerkType::shrink:
-		m_Dest.w = Player::s_OriginalWidth / 1.5f;
+		m_Dest.w = Player::s_OriginalWidth / 1.2f;
 		break;
 	case PerkType::supersize:
 		// Check is the player shrinked and enlarge him accordingly to original size
 		if (m_Affect == PerkType::shrink)
 		{
-			m_Dest.w = Player::s_OriginalWidth * 1.5f;
+			m_Dest.w = Player::s_OriginalWidth + Player::s_OriginalWidth * 0.3f;
 			break;
 		}
 		
 		// Limit enlarging to 3 times
-		if (m_Dest.w < Player::s_OriginalWidth * (1.5f * 3))
+		if (m_Dest.w < (float)Player::s_OriginalWidth + (float)Player::s_OriginalWidth * (0.3f * 3.0f))
 		{
-			m_Dest.w *= 1.5f;
+			m_Dest.w += ((float)Player::s_OriginalWidth * 0.3f);
 		}
 		break;
 	case PerkType::none:
