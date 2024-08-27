@@ -12,6 +12,7 @@ enum class EntityGroup
 	players,
 	tiles,
 	perks,
+	floor,
 	size
 };
 
@@ -22,13 +23,13 @@ class Manager;
 class Entity
 {
 public:
-	Entity(Manager& manager, const SDL_FRect& destRect) : m_Manager(manager), dest(destRect) {}
+	Entity(const SDL_FRect& destRect);
 	virtual ~Entity(){}
 
 	virtual void Update() {}
 	virtual void Draw() {}
 
-	const SDL_FRect& GetPos() const { return dest; }
+	const SDL_FRect& GetPos() const { return m_Dest; }
 
 	void Destroy() { m_IsActive = false; }
 	bool IsActive() const { return m_IsActive; }
@@ -37,10 +38,10 @@ public:
 	void AddGroup(EntityGroup group);
 	void DeleteGroup(EntityGroup group) { m_GroupBitSet[static_cast<std::size_t>(group)] = false; }
 protected:
-	SDL_FRect dest;
+	SDL_FRect m_Dest;
 private:
 	bool m_IsActive = true;
-	Manager& m_Manager;
+	Manager* m_Manager = nullptr;
 	std::bitset<entityGroupSize> m_GroupBitSet;
 };
 

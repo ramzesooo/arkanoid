@@ -4,6 +4,7 @@
 #include "tile.h"
 #include "ball.h"
 #include "perk.h"
+#include "floor.h"
 #include "log.h"
 
 #include "SDL.h"
@@ -35,8 +36,6 @@ public:
 	void Render();
 	// End
 
-
-
 	void AddBall(float startX, float startY, float velocityX, float velocityY);
 	void AddTile(TileType type, float posX, float posY);
 
@@ -53,6 +52,7 @@ public:
 			case supersize: return "perkSupersize";
 			case addball: return "perkAddBall";
 			case duplicateball: return "perkDuplicateBall";
+			case floor: return "perkFloor";
 		}
 
 		return "perkNone";
@@ -87,6 +87,7 @@ public:
 	static std::unique_ptr<Manager> s_Manager;
 private:
 	Player* player = nullptr;
+	Floor* floor = nullptr;
 	bool m_IsRunning = false;
 	std::random_device rnd;
 

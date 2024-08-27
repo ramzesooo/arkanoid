@@ -58,6 +58,7 @@ App::App()
 	// Primary textures
 	s_Assets->LoadTexture("defaultBall", "assets/ball256x256.png");
 	s_Assets->LoadTexture("player", "assets/player64x32.png");
+	s_Assets->LoadTexture("floorSquare", "assets/floor_square.png");
 
 	s_Assets->LoadTexture(TextureOfTile(TileType::wall), "assets/tiles/wall_tile.png");
 	s_Assets->LoadTexture(TextureOfTile(TileType::green), "assets/tiles/green_tile.png");
@@ -69,6 +70,7 @@ App::App()
 	s_Assets->LoadTexture(TextureOfPerk(PerkType::supersize), "assets/perks/supersize_player.png");
 	s_Assets->LoadTexture(TextureOfPerk(PerkType::addball), "assets/perks/add_ball.png");
 	s_Assets->LoadTexture(TextureOfPerk(PerkType::duplicateball), "assets/perks/duplicate_ball.png");
+	s_Assets->LoadTexture(TextureOfPerk(PerkType::floor), "assets/perks/floor.png");
 	s_Assets->LoadTexture("perkHidden", "assets/perks/hidden_perk.png");
 
 	{
@@ -135,6 +137,8 @@ App::App()
 
 	player = s_Manager->NewEntity<Player>();
 
+	floor = s_Manager->NewEntity<Floor>();
+
 	m_IsRunning = initialized;
 
 	s_Logger->LogConstructor(typeid(*this).name());
@@ -176,28 +180,29 @@ void App::EventHandler()
 		{
 			switch (App::s_Event.key.keysym.sym)
 			{
+				// display balls size in console
 			case SDLK_TAB:
 				App::s_Logger->Print(typeid(*this).name(), std::string("Active balls: ") + std::to_string(balls.size()));
 				break;
+				// drop perk duplicate ball
 			case SDLK_F1:
-			{
-				std::string_view textureID = TextureOfPerk(PerkType::duplicateball);
-
-				App::s_Manager->NewEntity<Perk>(textureID, player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 50, PerkType::duplicateball);
-			}
+				App::s_Manager->NewEntity<Perk>(TextureOfPerk(PerkType::duplicateball), player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 30.0f, PerkType::duplicateball);
 				break;
+				// drop perk add ball
 			case SDLK_F2:
-			{
-				std::string_view textureID = TextureOfPerk(PerkType::addball);
-
-				App::s_Manager->NewEntity<Perk>(textureID, player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 50, PerkType::addball);
-			}
+				App::s_Manager->NewEntity<Perk>(TextureOfPerk(PerkType::addball), player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 30.0f, PerkType::addball);
 				break;
+				// change invisible mode for player
 			case SDLK_F3:
 				player->SwitchInvisible();
 
 				App::s_Logger->Print(typeid(*this).name(), std::to_string(player->GetInvisible()));
 				break;
+				// drop perk floor
+			case SDLK_F4:
+				App::s_Manager->NewEntity<Perk>(TextureOfPerk(PerkType::floor), player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 30.0f, PerkType::floor);
+				break;
+				// spawn ball directly in the middle
 			case SDLK_F10:
 				AddBall(static_cast<float>(WINDOW_WIDTH / 2), static_cast<float>(WINDOW_HEIGHT / 2), 0.0f, 1.0f);
 				break;
@@ -227,7 +232,14 @@ void App::Update()
 
 		// TODO: Fix calculations for bouncing ball and adjust SDL_HasIntersectionF to project's needs
 
-		// Check for hitting a player at first place
+		// Check for hitting the floor if it's been shown
+		if (floor->IsShown() && SDL_HasIntersectionF(&ballPos, &floor->GetPos()))
+		{
+			static_cast<Ball*>(b)->HitPlayer(floor->GetPos());
+			continue;
+		}
+
+		// Check for hitting a player
 		if (!player->GetInvisible() && SDL_HasIntersectionF(&ballPos, &playerPos))
 		{
 			// If the ball collides with a player, then trigger function HitPlayer() in Ball class and skip rest of the code
@@ -311,6 +323,16 @@ void App::Update()
 				}
 			}
 			break;
+		case PerkType::floor:
+			if (floor->IsShown())
+			{
+				floor->Extend();
+			}
+			else
+			{
+				floor->Toggle();
+			}
+			break;
 		default:
 			break;
 		}
@@ -333,6 +355,8 @@ void App::Render()
 	{
 		t->Draw();
 	}
+
+	floor->Draw();
 
 	for (const auto& perk : perks)
 	{

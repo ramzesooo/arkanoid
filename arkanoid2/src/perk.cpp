@@ -6,16 +6,16 @@
 #include "SDL.h"
 
 Perk::Perk(std::string_view textureID, float startX, float startY, PerkType perkType)
-	: Entity(*App::s_Manager, { startX, startY, 20.0f, 20.0f }), m_TextureID(textureID), m_PerkType(perkType)
+	: Entity({ startX, startY, 20.0f, 20.0f }), m_TextureID(textureID), m_PerkType(perkType)
 {
 	AddGroup(EntityGroup::perks);
 }
 
 void Perk::Update()
 {
-	dest.y += 0.3f;
+	m_Dest.y += 0.3f;
 
-	if (dest.y >= (float)App::WINDOW_HEIGHT)
+	if (m_Dest.y >= (float)App::WINDOW_HEIGHT)
 	{
 		Destroy();
 	}
@@ -23,5 +23,5 @@ void Perk::Update()
 
 void Perk::Draw()
 {
-	App::s_Assets->DrawTexture(m_TextureID, Perk::perk_source, dest);
+	App::s_Assets->DrawTexture(m_TextureID, Perk::perk_source, m_Dest);
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include "entity.h"
 
+#include <string_view>
+
 enum class PerkType
 {
 	none = 0,
@@ -8,6 +10,7 @@ enum class PerkType
 	supersize,
 	addball,
 	duplicateball,
+	floor,
 	size
 };
 

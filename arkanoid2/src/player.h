@@ -10,9 +10,9 @@ public:
 	void Update() override;
 	void Draw() override;
 private:
-	static constexpr SDL_Rect player_source{ 0, 0, 64, 32 };
 	static constexpr uint32_t s_OriginalWidth = 64;
 	static constexpr uint32_t s_OriginalHeight = 32;
+	static constexpr SDL_Rect player_source{ 0, 0, 64, 32 };
 // AFFECTS
 public:
 	void SetAffect(PerkType perkType);

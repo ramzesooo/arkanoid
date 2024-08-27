@@ -23,6 +23,7 @@
     <ClCompile Include="src\assetManager.cpp" />
     <ClCompile Include="src\ball.cpp" />
     <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\floor.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\perk.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="src\assetManager.h" />
     <ClInclude Include="src\ball.h" />
     <ClInclude Include="src\entity.h" />
+    <ClInclude Include="src\floor.h" />
     <ClInclude Include="src\log.h" />
     <ClInclude Include="src\perk.h" />
     <ClInclude Include="src\player.h" />
