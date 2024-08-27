@@ -77,6 +77,8 @@ void Player::SetAffect(PerkType perkType)
 		}
 		break;
 	case PerkType::none:
+		CancelAffect();
+		return;
 	default:
 		break;
 	}

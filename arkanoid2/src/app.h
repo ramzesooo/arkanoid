@@ -14,7 +14,7 @@
 #include <memory>
 #include <random>
 
-constexpr uint16_t amountOfLevels = 2;
+constexpr uint16_t amountOfLevels = 3;
 
 struct Level
 {
@@ -41,6 +41,8 @@ public:
 
 	// DropPerk() is responsible for whole logic of checking the luck and drawing the perk
 	void DropPerk(float posX, float posY);
+
+	void LoadLevel();
 
 	inline std::string_view TextureOfPerk(PerkType type)
 	{

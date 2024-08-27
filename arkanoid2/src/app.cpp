@@ -127,7 +127,7 @@ App::App()
 					continue;
 				}
 
-				AddTile(currentLevel->levelData.at(y).at(x), (x * App::s_TilesWidth), (y * 16.0f));
+				AddTile(tileType, (x * App::s_TilesWidth), (y * 16.0f));
 			}
 		}
 	}
@@ -201,6 +201,10 @@ void App::EventHandler()
 				// drop perk floor
 			case SDLK_F4:
 				App::s_Manager->NewEntity<Perk>(TextureOfPerk(PerkType::floor), player->GetPos().x + player->GetPos().w / 2, player->GetPos().y - 30.0f, PerkType::floor);
+				break;
+			case SDLK_F5:
+				currentLevelID++;
+				LoadLevel();
 				break;
 				// spawn ball directly in the middle
 			case SDLK_F10:
@@ -412,5 +416,63 @@ void App::DropPerk(float posX, float posY)
 		std::string_view textureID = showTexture ? TextureOfPerk(perkType) : "perkHidden";
 
 		s_Manager->NewEntity<Perk>(textureID, posX, posY, perkType);
+	}
+}
+
+void App::LoadLevel()
+{
+	if (currentLevelID >= amountOfLevels)
+	{
+		App::s_Logger->Print(typeid(*this).name(), std::string("Level ") + std::to_string(currentLevelID) + " doesn't exist");
+		currentLevelID = 0;
+		return;
+	}
+
+	if (!levels.at(currentLevelID) || levels.at(currentLevelID)->m_IsFailed)
+	{
+		App::s_Logger->Print(typeid(levels.at(currentLevelID)).name(), std::string("Couldn't load level ") + std::to_string(currentLevelID));
+		currentLevelID = 0;
+		return;
+	}
+
+	// Clean all stuff
+	for (const auto& t : tiles)
+	{
+		t->Destroy();
+	}
+
+	for (const auto& b : balls)
+	{
+		b->Destroy();
+	}
+
+	for (const auto& p : perks)
+	{
+		p->Destroy();
+	}
+
+	player->CancelAffect();
+	
+	if (floor->IsShown())
+	{
+		floor->Toggle();
+	}
+
+	Level* currentLevel = levels.at(currentLevelID).get();
+	TileType tileType;
+
+	for (uint32_t y = 0; y < 15; y++)
+	{
+		for (uint32_t x = 0; x < 20; x++)
+		{
+			tileType = currentLevel->levelData.at(y).at(x);
+
+			if (!(uint32_t)tileType)
+			{
+				continue;
+			}
+
+			AddTile(tileType, (x * App::s_TilesWidth), (y * 16.0f));
+		}
 	}
 }
