@@ -4,17 +4,17 @@
 #include "app.h"
 
 Tile::Tile(std::string_view textureID, float startX, float startY) 
-	: Entity(*App::s_Manager, { startX, startY, App::s_TilesWidth, 16 }), m_TextureID(static_cast<std::string>(textureID))
+	: Entity(*App::s_Manager, { startX, startY, App::s_TilesWidth, 16 }), m_TextureID(textureID)
 {
 	AddGroup(EntityGroup::tiles);
 
-	App::s_Logger->LogConstructor(typeid(*this).name());
+	//App::s_Logger->LogConstructor(typeid(*this).name());
 }
 
-void Tile::Update()
-{
-
-}
+//void Tile::Update()
+//{
+//
+//}
 
 void Tile::Draw()
 {

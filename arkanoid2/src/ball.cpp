@@ -4,8 +4,8 @@
 #include "app.h"
 #include "log.h"
 
-Ball::Ball(float startX, float startY, Velocity startVelocity) 
-	: Entity(*App::s_Manager, { startX, startY, 12.0f, 12.0f }), velocity(startVelocity)
+Ball::Ball(float startX, float startY, float velocityX, float velocityY)
+	: Entity(*App::s_Manager, { startX, startY, Ball::s_OriginalWidth, Ball::s_OriginalHeight }), velocity{ velocityX, velocityY }
 {
 	dest.x = startX;
 	dest.y = startY;
@@ -20,7 +20,7 @@ void Ball::Draw()
 
 void Ball::Update()
 {
-	if (dest.y >= App::WINDOW_HEIGHT)
+	if (dest.y >= App::WINDOW_HEIGHT || velocity.y == 0.0f)
 	{
 		Destroy();
 		return;

@@ -7,10 +7,18 @@
 #include "log.h"
 
 #include "SDL.h"
-#include <vector>
 #include <string>
+#include <vector>
+#include <unordered_map>
 #include <memory>
 #include <random>
+
+constexpr uint16_t amountOfLevels = 2;
+
+struct Level
+{
+	std::vector<std::vector<TileType>> levelData;
+};
 
 class App
 {
@@ -26,23 +34,42 @@ public:
 	void Render();
 	// End
 
-	void AddBall(float startX, float startY, Velocity velocity);
 
+
+	void AddBall(float startX, float startY, float velocityX, float velocityY);
 	void AddTile(std::string_view textureID, float posX, float posY);
 
-	inline std::string_view textureOf(PerkType type) {
+	// DropPerk() is responsible for whole logic of checking the luck and drawing the perk
+	void DropPerk(float posX, float posY);
+
+	inline std::string_view TextureOfPerk(PerkType type)
+	{
 		using enum PerkType;
-		switch (type) {
-		case shrink: return "perkShrink";
-		case supersize: return "perkSupersize";
-		case addball: return "perkAddBall";
-		case duplicateball: return "perkDuplicateBall";
+
+		switch (type)
+		{
+			case shrink: return "perkShrink";
+			case supersize: return "perkSupersize";
+			case addball: return "perkAddBall";
+			case duplicateball: return "perkDuplicateBall";
 		}
+
 		return "perkNone";
 	}
 
-	// DropPerk() is responsible for the whole logic of checking the luck and drawing the perk
-	void DropPerk(float posX, float posY);
+	inline std::string_view TextureOfTile(TileType type)
+	{
+		using enum TileType;
+
+		switch (type)
+		{
+			case wall: return "wallTile";
+			case green: return "greenTile";
+			case blue: return "blueTile";
+		}
+
+		return "perkNone";
+	}
 
 	static const uint32_t WINDOW_WIDTH;
 	static const uint32_t WINDOW_HEIGHT;
@@ -61,4 +88,8 @@ private:
 	Player* player = nullptr;
 	bool m_IsRunning = false;
 	std::random_device rnd;
+
+	std::size_t currentLevelID = 0;
+	std::vector<std::unique_ptr<Level>> levels;
+	//std::unordered_map<uint16_t, std::unique_ptr<Level>> levels;
 };

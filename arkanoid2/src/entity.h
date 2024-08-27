@@ -31,14 +31,13 @@ public:
 	const SDL_FRect& GetPos() const { return dest; }
 
 	void Destroy() { m_IsActive = false; }
-
 	bool IsActive() const { return m_IsActive; }
 
 	bool HasGroup(EntityGroup group) const { return m_GroupBitSet[static_cast<std::size_t>(group)]; }
 	void AddGroup(EntityGroup group);
 	void DeleteGroup(EntityGroup group) { m_GroupBitSet[static_cast<std::size_t>(group)] = false; }
 protected:
-	SDL_FRect dest{ .0f, .0f, .0f, .0f };
+	SDL_FRect dest;
 private:
 	bool m_IsActive = true;
 	Manager& m_Manager;

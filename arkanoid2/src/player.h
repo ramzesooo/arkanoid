@@ -9,23 +9,24 @@ public:
 
 	void Update() override;
 	void Draw() override;
-
-	void SetAffect(PerkType perkType);
-
-	const PerkType& GetAffect() const { return m_Affect; }
-	void CancelAffect();
-
-	void SetInvisible() { m_Invisible = !m_Invisible; }
-	bool GetInvisible() const { return m_Invisible; }
 private:
 	static constexpr SDL_Rect player_source{ 0, 0, 64, 32 };
-
-	// Used to count passed time after catching appropriate perk
-	//double m_StartTime = NULL;
-	//double m_EndTime = NULL;
-	uint32_t m_EndTime = NULL;
-
+	static constexpr uint32_t s_OriginalWidth = 64;
+	static constexpr uint32_t s_OriginalHeight = 32;
+// AFFECTS
+public:
+	void SetAffect(PerkType perkType);
+	const PerkType& GetAffect() const { return m_Affect; }
+	void CancelAffect();
+private:
 	PerkType m_Affect = PerkType::none;
 
+	// Used to count passed time after catching appropriate perk
+	uint32_t m_EndTime = NULL;
+// INVISIBLE
+public:
+	void SwitchInvisible() { m_Invisible = !m_Invisible; }
+	bool GetInvisible() const { return m_Invisible; }
+private:
 	bool m_Invisible = false;
 };
